@@ -1,79 +1,63 @@
-# interviewi
+# AI Interview Wizard (interviewi)
 
-Welcome to the `interviewi` project.
+An intelligent, multi-page technical interview simulator powered by Google Gemini AI. 
 
-## Directory Structure
+This application allows users to generate customized technical interview questions based on their tech stack and experience. It guides them through a seamless question-by-question wizard, asynchronously evaluating their answers in the background, and provides comprehensive feedback and scoring upon completion.
 
-The project is divided into two main parts:
+## 🌟 Features
+- **AI-Powered Question Generation**: Generates relevant technical questions using Google Gemini 1.5 Flash.
+- **Interactive Multi-Page Wizard**: Focused, one-question-at-a-time user experience with progress tracking.
+- **Background Evaluation**: Non-blocking architecture evaluates answers asynchronously as the user progresses.
+- **Rich Results Dashboard**: Animated circular score charts and detailed feedback (strengths and areas for improvement).
 
-- **interview-api**: The Python Flask backend application.
-- **web**: The Angular frontend application.
+---
 
+## 🏗️ Architecture
+
+The project is structured as a mono-repo divided into two main applications:
+
+- **qc-api (Backend)**: Python Flask API utilizing SQLAlchemy (SQLite/PostgreSQL) and LangChain for AI integration.
+- **web (Frontend)**: Angular 18 Single Page Application with custom CSS, glassmorphism UI, and RxJS state management.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Node.js 18+ & npm
+- Google Gemini API Key
+
+### 1. Backend Setup (`qc-api`)
+```bash
+cd qc-api
+python -m venv venv
+# Windows: .\venv\Scripts\Activate
+# Mac/Linux: source venv/bin/activate
+
+pip install -r requirements.txt
+
+# Create your environment file
+cp .env.example .env
+# Edit .env and add your GOOGLE_API_KEY
+
+# Start the Flask server (runs on http://localhost:5000)
+python app.py
 ```
-interviewi/
-├── interview-api/
-│   ├── controllers/   # Route handlers and request processing
-│   ├── models/        # Database models and schemas
-│   └── services/      # Business logic and external service integrations
-└── web/
-    └── src/
-        ├── app/       # Angular components and modules
-        ├── assets/    # Static assets
-        └── environments/ # Configuration files
+
+### 2. Frontend Setup (`web`)
+```bash
+cd web
+npm install
+
+# Start the Angular development server (runs on http://localhost:4200)
+npm start
 ```
 
-## Backend (interview-api) Instructions
+---
 
-The backend is built using **Python** and **Flask**. It follows a layered architecture to separate concerns.
-
-### Code Structure
-
-- **Controllers (`controllers/`)**: 
-  - Define the API endpoints (routes).
-  - Parse requests and send responses.
-  - Call services to perform business logic.
-  - *Example*: `auth_controller.py` handles `/login` and `/register`.
-
-- **Services (`services/`)**:
-  - Contain the core business logic.
-  - Interact with database models or external APIs.
-  - *Example*: `auth_service.py` handles password hashing and token generation.
-
-- **Models (`models/`)**:
-  - Define the data structure (e.g., SQLAlchemy classes).
-  - Interact directly with the database.
-  - *Example*: `user_model.py` represents the User table.
-
-### Flask Framework Setup
-
-To get started with the backend:
-
-1.  **Create a Virtual Environment**:
-    ```bash
-    cd interview-api
-    python -m venv venv
-    ```
-
-2.  **Activate Virtual Environment**:
-    - Windows: `.\venv\Scripts\Activate`
-    - Mac/Linux: `source venv/bin/activate`
-
-3.  **Install Dependencies**:
-    *Ensure you have a `requirements.txt` file (create one if missing).*
-    ```bash
-    pip install flask
-    ```
-
-4.  **Run the Application**:
-    *Create a main entry point like `app.py` or `run.py` in the `interview-api` root.*
-    ```bash
-    python run.py
-    ```
-
-## Frontend (web)
-
-The frontend uses the **Angular** folder structure.
-
-- **src/app**: Contains the main application logic, components, and modules.
-- **src/assets**: Stores images, icons, and global styles.
-- **src/environments**: Holds environment-specific variables (api URLs, etc).
+## 📖 Documentation
+Detailed documentation about the architecture and implementation flows can be found in the root directory:
+- `IMPLEMENTATION_SUMMARY.md`: Overview of the wizard flow refactor.
+- `WIZARD_FLOW_DOCUMENTATION.md`: Deep dive into the multi-page logic.
+- `QUICK_START.md`: Additional commands and routing information.
