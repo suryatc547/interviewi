@@ -1,0 +1,139 @@
+<div class="results-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading your results...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h2>Oops! Something went wrong</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" routerLink="/">Go Back Home</button>
+  </div>
+
+  <!-- Results Content -->
+  <div *ngIf="!isLoading && !errorMessage" class="content">
+    <!-- Header -->
+    <div class="results-header">
+      <h1>🎯 Interview Results</h1>
+      <p class="subtitle">Here's how you performed on this technical interview</p>
+    </div>
+
+    <!-- Overall Score Card -->
+    <div class="overall-score-card">
+      <div class="score-circle">
+        <svg viewBox="0 0 200 200" class="circular-progress">
+          <circle cx="100" cy="100" r="90" class="bg-circle"></circle>
+          <circle 
+            cx="100" 
+            cy="100" 
+            r="90" 
+            class="progress-circle"
+            [style.stroke-dashoffset]="565 - (565 * overallPercentage / 100)"
+            [ngClass]="scoreGradeClass"
+          ></circle>
+        </svg>
+        <div class="score-text">
+          <div class="score-value">{{ overallScore }}</div>
+          <div class="score-total">/10</div>
+        </div>
+      </div>
+      
+      <div class="score-details">
+        <h2>Overall Performance</h2>
+        <div class="grade-badge" [ngClass]="scoreGradeClass">
+          {{ scoreGrade }}
+        </div>
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ answeredQuestions }}</span>
+            <span class="stat-label">Questions Answered</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ questions.length }}</span>
+            <span class="stat-label">Total Questions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ overallPercentage }}%</span>
+            <span class="stat-label">Success Rate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions Breakdown -->
+    <div class="questions-breakdown">
+      <h2 class="section-title">📊 Detailed Breakdown</h2>
+      
+      <div class="question-results-list">
+        <div 
+          *ngFor="let q of questions; let i = index" 
+          class="question-result-card"
+          [class.expanded]="isQuestionExpanded(q.id)"
+        >
+          <div class="question-summary" (click)="toggleQuestionDetails(q.id)">
+            <div class="question-info">
+              <div class="question-header-row">
+                <span class="question-num">Q{{ i + 1 }}</span>
+                <span class="badge topic">{{ q.topic }}</span>
+                <span class="badge difficulty" [ngClass]="q.difficulty.toLowerCase()">
+                  {{ q.difficulty }}
+                </span>
+              </div>
+              <p class="question-text-preview">{{ q.text }}</p>
+            </div>
+            
+            <div class="question-score-badge" [ngClass]="getScoreClass(q.answer?.ai_score || 0)">
+              <div class="score-number">{{ q.answer?.ai_score || 0 }}</div>
+              <div class="score-max">/10</div>
+            </div>
+
+            <div class="expand-icon">
+              {{ isQuestionExpanded(q.id) ? '▲' : '▼' }}
+            </div>
+          </div>
+
+          <!-- Expanded Details -->
+          <div class="question-details" *ngIf="isQuestionExpanded(q.id)">
+            <div class="detail-section">
+              <h4>Your Answer:</h4>
+              <div class="answer-text">
+                {{ q.answer?.text || 'No answer provided' }}
+              </div>
+            </div>
+
+            <div class="detail-section" *ngIf="q.answer?.ai_feedback">
+              <h4>AI Evaluation:</h4>
+              <div class="feedback-text">
+                <pre>{{ q.answer?.ai_feedback }}</pre>
+              </div>
+            </div>
+
+            <div class="detail-section" *ngIf="!q.answer?.ai_feedback">
+              <div class="no-feedback">
+                <p>⏳ Evaluation in progress or answer not submitted</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-secondary" (click)="retakeInterview()">
+        🔄 Retake Interview
+      </button>
+      <button class="btn btn-primary" (click)="startNewInterview()">
+        ✨ Start New Interview
+      </button>
+    </div>
+
+    <!-- Footer Message -->
+    <div class="footer-message">
+      <p>Keep practicing and improving! 💪</p>
+    </div>
+  </div>
+</div>

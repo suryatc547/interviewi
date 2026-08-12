@@ -1,0 +1,126 @@
+<div class="question-answer-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading questions...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h2>Oops! Something went wrong</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" routerLink="/">Go Back Home</button>
+  </div>
+
+  <!-- Question Content -->
+  <div *ngIf="!isLoading && !errorMessage && currentQuestion" class="content">
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="question-counter">Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</span>
+        <span class="progress-percentage">{{ progress }}% Complete</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress"></div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="question-card">
+      <!-- Question Header -->
+      <div class="question-header">
+        <div class="question-badges">
+          <span class="badge topic">{{ currentQuestion.topic }}</span>
+          <span class="badge difficulty" [ngClass]="currentQuestion.difficulty.toLowerCase()">
+            {{ currentQuestion.difficulty }}
+          </span>
+        </div>
+        <div class="question-number">Q{{ currentQuestionIndex + 1 }}</div>
+      </div>
+
+      <!-- Question Text -->
+      <div class="question-text">
+        <h2>{{ currentQuestion.text }}</h2>
+      </div>
+
+      <!-- Answer Section -->
+      <div class="answer-section">
+        <label class="answer-label">Your Answer:</label>
+        
+        <textarea 
+          class="answer-textarea"
+          [class.error]="isAnswerTooLong()"
+          [(ngModel)]="userAnswer"
+          (ngModelChange)="onAnswerChange()"
+          placeholder="Type your answer here... Be detailed and specific."
+          rows="10"
+          [disabled]="isSaving"
+        ></textarea>
+
+        <!-- Character Count -->
+        <div class="character-count" [ngClass]="getCharacterCountClass()">
+          <span *ngIf="!isAnswerTooLong()">
+            {{ getCharacterCount() }} / {{ MAX_ANSWER_LENGTH }} characters
+            <span *ngIf="getRemainingCharacters() < 500" class="warning-text">
+              ({{ getRemainingCharacters() }} remaining)
+            </span>
+          </span>
+          <span *ngIf="isAnswerTooLong()" class="error-text">
+            ⚠ Answer exceeds maximum length by {{ -getRemainingCharacters() }} characters
+          </span>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages" *ngIf="saveMessage">
+          <div class="save-message" [class.success]="saveMessage.includes('✓')">
+            {{ saveMessage }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+      <button 
+        class="btn btn-secondary"
+        [disabled]="isFirstQuestion || isSaving"
+        (click)="previousQuestion()"
+      >
+        ← Previous
+      </button>
+
+      <button 
+        class="btn btn-outline"
+        [disabled]="isSaving"
+        (click)="skipQuestion()"
+      >
+        Skip Question
+      </button>
+
+      <button 
+        class="btn btn-primary btn-submit"
+        [disabled]="!canSubmit()"
+        (click)="saveAndNext()"
+      >
+        <span *ngIf="!isSaving && !isLastQuestion">Save & Next →</span>
+        <span *ngIf="!isSaving && isLastQuestion">Save & View Results 🎯</span>
+        <span *ngIf="isSaving">
+          <span class="spinner-small"></span>
+          Saving...
+        </span>
+      </button>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="tips-section">
+      <h4>💡 Tips for a great answer:</h4>
+      <ul>
+        <li>Be specific and provide examples where relevant</li>
+        <li>Structure your answer clearly with proper explanations</li>
+        <li>Address all parts of the question</li>
+        <li>Use technical terms appropriately</li>
+      </ul>
+    </div>
+  </div>
+</div>

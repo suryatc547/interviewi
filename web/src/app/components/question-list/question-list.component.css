@@ -1,0 +1,347 @@
+.questions-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.questions-container h3 {
+  font-size: 1.8em;
+  margin-bottom: 30px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.question-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e0e4e8;
+  padding: 25px;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.question-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.question-number {
+  font-weight: 700;
+  font-size: 1.3em;
+  color: #2c3e50;
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.badge.topic {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.badge.difficulty.easy { 
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.badge.difficulty.medium { 
+  background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+  color: #333;
+}
+
+.badge.difficulty.hard { 
+  background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+}
+
+.question-text {
+  font-size: 1.15em;
+  line-height: 1.7;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.score {
+  margin-left: auto;
+  font-weight: 700;
+  color: #667eea;
+  font-size: 1.1em;
+  padding: 6px 14px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 20px;
+}
+
+/* Answer Section Styles */
+.answer-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e4e8;
+}
+
+.answer-label {
+  display: block;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.answer-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #d1d8e0;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  resize: vertical;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  color: #2c3e50;
+}
+
+.answer-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background-color: #fafbfc;
+}
+
+.answer-textarea.error {
+  border-color: #ee0979;
+  background-color: #fff5f5;
+}
+
+.answer-textarea.error:focus {
+  box-shadow: 0 0 0 3px rgba(238, 9, 121, 0.1);
+}
+
+/* Character Count */
+.character-count {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #6c757d;
+  text-align: right;
+  transition: all 0.2s ease;
+}
+
+.character-count.warning {
+  color: #f7971e;
+  font-weight: 600;
+}
+
+.character-count.error {
+  color: #ee0979;
+  font-weight: 700;
+}
+
+.warning-text {
+  color: #f7971e;
+  font-weight: 600;
+}
+
+.error-text {
+  color: #ee0979;
+  font-weight: 700;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0e8378 0%, #30d66a 100%);
+}
+
+/* Messages */
+.messages {
+  margin-top: 12px;
+}
+
+.save-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-bottom: 8px;
+  animation: slideIn 0.3s ease;
+}
+
+.save-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.error-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+  font-size: 0.95em;
+  font-weight: 600;
+  animation: slideIn 0.3s ease;
+}
+
+/* Evaluation Feedback */
+.evaluation-feedback {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  border: 2px solid #667eea;
+  animation: fadeIn 0.5s ease;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.feedback-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.ai-score {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #667eea;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-content {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.feedback-content pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #2c3e50;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .score {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .feedback-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ai-score {
+    align-self: flex-start;
+  }
+}

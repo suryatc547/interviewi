@@ -1,0 +1,40 @@
+<div class="interview-container">
+  <div class="form-section">
+    <h2>Generate Interview Questions</h2>
+    <form [formGroup]="interviewForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input id="name" type="text" formControlName="name" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" type="email" formControlName="email" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="stack">Tech Stack:</label>
+        <select id="stack" formControlName="stack" class="form-control">
+          <option value="">Select Stack</option>
+          <option *ngFor="let stack of techStacks" [value]="stack">{{ stack }}</option>
+        </select>
+      </div>
+
+      <div formGroupName="experience" *ngIf="interviewForm.get('stack')?.value">
+        <h3>Experience (Years)</h3>
+        <div class="form-group" *ngFor="let tech of getTechnologies()">
+          <label [for]="tech">{{ tech }}:</label>
+          <input [id]="tech" type="number" [formControlName]="tech" class="form-control" min="0">
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="!interviewForm.valid || loading" class="btn btn-primary">
+        {{ loading ? 'Generating...' : 'Generate Questions' }}
+      </button>
+    </form>
+  </div>
+</div>

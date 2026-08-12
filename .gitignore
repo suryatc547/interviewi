@@ -1,0 +1,38 @@
+# Python / Flask (Backend)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.env*
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+instance/
+*.db
+*.sqlite3
+
+# Node / Angular (Frontend)
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
