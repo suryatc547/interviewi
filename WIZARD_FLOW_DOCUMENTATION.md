@@ -222,7 +222,7 @@ const routes: Routes = [
 
 1. **Start Backend**
    ```bash
-   cd interview-api
+   cd qc-api
    python app.py
    ```
 

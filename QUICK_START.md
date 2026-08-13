@@ -4,7 +4,7 @@
 
 ### Step 1: Start Backend
 ```bash
-cd interview-api
+cd qc-api
 python app.py
 ```
 Backend runs on: **http://localhost:5000**
@@ -82,7 +82,7 @@ Results Page → View Score → See Feedback
 - Google Gemini AI
 
 **Frontend:**
-- Angular 18
+- Angular 16
 - TypeScript
 - RxJS
 - Custom CSS
@@ -92,11 +92,11 @@ Results Page → View Score → See Feedback
 ## 📁 Project Structure
 
 ```
-interview-api/
+qc-api/
   ├── app.py                    # Flask app entry
   ├── models/models.py          # Database models
   ├── controllers/
-  │   └── interview_controller.py  # API endpoints
+  │   └── qc_controller.py      # API endpoints
   └── services/
       └── gemini_service.py     # AI integration
 
@@ -104,11 +104,12 @@ web/
   ├── src/app/
   │   ├── app-routing.module.ts      # Routes
   │   ├── components/
-  │   │   ├── interview-form/        # Home page
+  │   │   ├── qc-form/               # Home page
   │   │   ├── question-answer/       # Answer page
   │   │   └── results/               # Results page
-  │   └── services/
-  │       └── interview.service.ts   # API calls
+  │   ├── services/
+  │   │   └── qc.service.ts          # API calls
+  │   └── environments/              # environment.ts + environment.prod.ts
 ```
 
 ---
@@ -129,30 +130,34 @@ web/
 ## ⚡ Quick Commands
 
 ```bash
-# Install backend dependencies
-cd interview-api && pip install -r requirements.txt
+# Install backend dependencies (runtime + dev)
+cd qc-api && pip install -r requirements-dev.txt
 
 # Install frontend dependencies
 cd web && npm install
 
 # Run backend
-cd interview-api && python app.py
+cd qc-api && python app.py
 
 # Run frontend
 cd web && npm start
 
-# Build for production
-cd web && npm run build
+# Backend tests + lint
+cd qc-api && python -m pytest -q && python -m ruff check .
+
+# Frontend tests + lint + build
+cd web && npm run test:ci && npm run lint && npm run build
 ```
 
 ---
 
 ## 🔑 Environment Setup
 
-Create `interview-api/.env`:
+Create `qc-api/.env` (see `.env.example`):
 ```env
 GOOGLE_API_KEY=your_gemini_api_key
-DATABASE_URI=sqlite:///interview.db
+DATABASE_URL=sqlite:///interview.db
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 ---

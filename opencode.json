@@ -1,0 +1,42 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "allow",
+    "external_directory": {
+      "*": "ask"
+    },
+    "bash": {
+      "*": "ask",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git branch*": "allow",
+      "git fetch*": "allow",
+      "git remote -v": "allow",
+      "python -m pytest*": "allow",
+      "python -m ruff*": "allow",
+      "npm run lint*": "allow",
+      "npm run test:ci*": "allow",
+      "npm run build*": "allow",
+      "npm run format*": "allow",
+      "npm.cmd run lint*": "allow",
+      "npm.cmd run test:ci*": "allow",
+      "npm.cmd run build*": "allow",
+      "npm.cmd run format*": "allow",
+      "python -m pip install*": "ask",
+      "npm install*": "ask",
+      "npm.cmd install*": "ask",
+      "git add*": "ask",
+      "git commit*": "ask",
+      "git checkout*": "ask",
+      "git merge*": "ask",
+      "git rebase*": "ask",
+      "git push*": "deny",
+      "git reset --hard*": "deny",
+      "git clean*": "deny",
+      "rm -rf *": "deny",
+      "Remove-Item -Recurse*": "deny",
+      "Remove-Item -Force*": "deny"
+    }
+  }
+}

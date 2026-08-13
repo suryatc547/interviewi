@@ -5,7 +5,7 @@ An intelligent, multi-page technical interview simulator powered by Google Gemin
 This application allows users to generate customized technical interview questions based on their tech stack and experience. It guides them through a seamless question-by-question wizard, asynchronously evaluating their answers in the background, and provides comprehensive feedback and scoring upon completion.
 
 ## 🌟 Features
-- **AI-Powered Question Generation**: Generates relevant technical questions using Google Gemini 1.5 Flash.
+- **AI-Powered Question Generation**: Generates relevant technical questions using Google Gemini (default `gemini-2.5-flash`, configurable via `GEMINI_MODEL`).
 - **Interactive Multi-Page Wizard**: Focused, one-question-at-a-time user experience with progress tracking.
 - **Background Evaluation**: Non-blocking architecture evaluates answers asynchronously as the user progresses.
 - **Rich Results Dashboard**: Animated circular score charts and detailed feedback (strengths and areas for improvement).
@@ -17,7 +17,7 @@ This application allows users to generate customized technical interview questio
 The project is structured as a mono-repo divided into two main applications:
 
 - **qc-api (Backend)**: Python Flask API utilizing SQLAlchemy (SQLite/PostgreSQL) and LangChain for AI integration.
-- **web (Frontend)**: Angular 18 Single Page Application with custom CSS, glassmorphism UI, and RxJS state management.
+- **web (Frontend)**: Angular 16 Single Page Application with custom CSS, glassmorphism UI, and RxJS state management.
 
 ---
 
@@ -35,11 +35,11 @@ python -m venv venv
 # Windows: .\venv\Scripts\Activate
 # Mac/Linux: source venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # runtime + dev deps (pytest, ruff)
 
 # Create your environment file
 cp .env.example .env
-# Edit .env and add your GOOGLE_API_KEY
+# Edit .env and add your GOOGLE_API_KEY (GEMINI_MODEL is optional)
 
 # Start the Flask server (runs on http://localhost:5000)
 python app.py
@@ -52,6 +52,18 @@ npm install
 
 # Start the Angular development server (runs on http://localhost:4200)
 npm start
+```
+
+### 3. Tests & lint
+```bash
+# Backend (from qc-api/)
+python -m pytest -q        # 31 tests
+python -m ruff check .
+
+# Frontend (from web/)
+npm run test:ci             # Karma headless
+npm run lint
+npm run build               # production build
 ```
 
 ---

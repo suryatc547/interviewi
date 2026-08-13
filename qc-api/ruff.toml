@@ -1,0 +1,9 @@
+line-length = 100
+target-version = "py38"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["B008"]
+
+[lint.isort]
+known-first-party = ["models", "controllers", "services", "config"]

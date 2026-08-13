@@ -32,7 +32,7 @@ Added `evaluate_answer()` method:
   - `strengths`: List of strong points
   - `improvements`: Areas for improvement
 
-### 3. API Endpoints (`controllers/interview_controller.py`)
+### 3. API Endpoints (`controllers/qc_controller.py`)
 
 #### GET `/api/interview/questions/<interview_id>`
 - Retrieves all questions for an interview
@@ -61,7 +61,7 @@ Features:
 
 ## Frontend Changes
 
-### 1. Interview Service (`services/interview.service.ts`)
+### 1. Interview Service (`services/qc.service.ts`)
 Added three new methods:
 - `getQuestions(interviewId)`: Fetch questions for an interview
 - `submitAnswer(questionId, answerText)`: Save user's answer
@@ -156,7 +156,7 @@ The AI evaluates answers based on:
 
 After pulling these changes, run the Flask app to auto-create the new `answers` table:
 ```bash
-cd interview-api
+cd qc-api
 python app.py
 ```
 
@@ -167,7 +167,7 @@ The `db.create_all()` in `app.py` will automatically create the new table.
 ### Backend Testing
 ```bash
 # Start the Flask API
-cd interview-api
+cd qc-api
 python app.py
 
 # API will run on http://localhost:5000
