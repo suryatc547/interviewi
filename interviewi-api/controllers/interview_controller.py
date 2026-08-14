@@ -20,8 +20,19 @@ def generate_interview():
         experience = data.get('experience') # Dictionary of {skill: years}
         job_description = data.get('job_description')
 
-        if not all([name, email, role, industry, experience]):
-            return jsonify({"error": "Missing required fields"}), 400
+        missing = [
+            field
+            for field, value in [
+                ("name", name),
+                ("email", email),
+                ("role", role),
+                ("industry", industry),
+                ("experience", experience),
+            ]
+            if not value
+        ]
+        if missing:
+            return jsonify({"error": "Missing required fields: " + ", ".join(missing)}), 400
 
         if not isinstance(role, str) or not role.strip():
             return jsonify({"error": "role must be a non-empty string"}), 400
