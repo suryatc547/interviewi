@@ -23,7 +23,7 @@ describe('InterviewService', () => {
   });
 
   it('should POST /generate with payload', () => {
-    const payload = { name: 'Alice', stack: 'Python' };
+    const payload = { name: 'Alice', role: 'Accountant', industry: 'Finance' };
     service.generateQuestions(payload).subscribe(res => expect(res).toEqual({ interview_id: 1 }));
 
     const req = httpMock.expectOne('http://localhost:5000/api/interview/generate');

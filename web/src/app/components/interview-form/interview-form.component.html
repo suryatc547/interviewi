@@ -13,19 +13,32 @@
       </div>
 
       <div class="form-group">
-        <label for="stack">Tech Stack:</label>
-        <select id="stack" formControlName="stack" class="form-control">
-          <option value="">Select Stack</option>
-          <option *ngFor="let stack of techStacks" [value]="stack">{{ stack }}</option>
-        </select>
+        <label for="role">Role:</label>
+        <input id="role" type="text" formControlName="role" class="form-control"
+          placeholder="e.g. Accountant, Registered Nurse, Software Engineer">
       </div>
 
-      <div formGroupName="experience" *ngIf="interviewForm.get('stack')?.value">
-        <h3>Experience (Years)</h3>
-        <div class="form-group" *ngFor="let tech of getTechnologies()">
-          <label [for]="tech">{{ tech }}:</label>
-          <input [id]="tech" type="number" [formControlName]="tech" class="form-control" min="0">
+      <div class="form-group">
+        <label for="industry">Industry:</label>
+        <input id="industry" type="text" formControlName="industry" class="form-control"
+          placeholder="e.g. Healthcare, Finance, Retail">
+      </div>
+
+      <div formArrayName="skills" class="form-group">
+        <h3>Skills &amp; Experience (Years)</h3>
+        <div *ngFor="let skillRow of skills.controls; let i = index" [formGroupName]="i" class="skill-row">
+          <input formControlName="skill" class="form-control" placeholder="Skill (e.g. Financial Reporting)">
+          <input formControlName="years" type="number" min="0" step="0.5" class="form-control skill-years" placeholder="Years">
+          <button type="button" class="btn btn-remove" (click)="removeSkill(i)">Remove</button>
         </div>
+        <button type="button" class="btn btn-add" (click)="addSkill()">+ Add Skill</button>
+      </div>
+
+      <div class="form-group">
+        <label for="job_description">Job Description (optional):</label>
+        <textarea id="job_description" formControlName="job_description" class="form-control"
+          rows="6" maxlength="20000" placeholder="Paste the job description to ground questions in the role's requirements..."></textarea>
+        <small class="field-hint">Max 20,000 characters.</small>
       </div>
 
       <div class="error-message" *ngIf="errorMessage">

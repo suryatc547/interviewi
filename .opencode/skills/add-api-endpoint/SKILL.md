@@ -9,7 +9,7 @@ Follow the existing layering: **model → service → controller → frontend se
 
 ## 1. Model (`interviewi-api/models/models.py`)
 
-- Add/change a class extending `db.Model`. Columns use `db.Column`, timestamps `db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)` for updated-at.
+- Add/change a class extending `db.Model`. Columns use `db.Column`, timestamps `db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)` for updated-at. `Interview` = `role` (String 100) + `industry` (String 100) + `experience_levels` (JSON `{skill: years}`) + optional `job_description` (Text, backs JD-grounded questions).
 - Tables are auto-created by `create_all()` at app startup — a new model shows up after a backend restart (no migration tooling; existing SQLite DBs will need the table created manually or a fresh DB).
 
 ## 2. Service logic (`interviewi-api/services/gemini_service.py`)
@@ -48,6 +48,7 @@ def my_route():
 - Use `logger.error(...)` — never `print(...)`. Use `db.session.get(Model, id)` — not `Model.query.get(id)`.
 - Import all models at the top of the controller; there is no circular-import reason for inline `from models.models import ...`.
 - Return the backend error envelope `{"error": str}` on failure — the frontend reads `error.error?.error`.
+- `POST /generate` accepts `name`, `email`, `role`, `industry`, and `experience` (dict of `{skill: years}`, required) plus optional `job_description` (max 20,000 chars; non-string → 400, over-length → 400 with `current_length`/`max_length`; role/industry must be non-empty strings ≤100 chars). They are stored on `Interview` (`role`, `industry`, `experience_levels`, `job_description`) and passed to `generate_questions` (and later `evaluate_answer`) for RAG grounding — see the `gemini-langchain` skill. Keep validation in the controller, matching the existing length/type patterns.
 - On AI-generation routes: if the AI returns empty, delete the interview row (which was committed *before* generation so the service's sqlite connection isn't locked) and return `502` rather than persisting a partial interview (see `generate_interview`).
 
 ## 4. Frontend service (`web/src/app/services/interview.service.ts`)

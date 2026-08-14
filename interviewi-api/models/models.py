@@ -16,8 +16,10 @@ class Interview(db.Model):
     __tablename__ = 'interviews'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    tech_stack = db.Column(db.String(50), nullable=False)
-    experience_levels = db.Column(db.JSON, nullable=False)
+    role = db.Column(db.String(100), nullable=False)
+    industry = db.Column(db.String(100), nullable=False)
+    experience_levels = db.Column(db.JSON, nullable=False)  # {skill: years}
+    job_description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     questions = db.relationship('Question', backref='interview', lazy=True)
 

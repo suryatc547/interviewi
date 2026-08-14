@@ -237,7 +237,7 @@ A complete refactor of the interview application from a single-page to a multi-p
 ### Generate Questions
 ```
 POST /api/interview/generate
-Body: { name, email, stack, experience }
+Body: { name, email, role, industry, experience: {skill: years}, job_description }
 Response: { interview_id, user, questions }
 ```
 

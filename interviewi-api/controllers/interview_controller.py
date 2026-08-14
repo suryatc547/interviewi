@@ -15,11 +15,41 @@ def generate_interview():
         data = request.get_json()
         name = data.get('name')
         email = data.get('email')
-        stack = data.get('stack')
-        experience = data.get('experience') # Dictionary of tech: years
+        role = data.get('role')
+        industry = data.get('industry')
+        experience = data.get('experience') # Dictionary of {skill: years}
+        job_description = data.get('job_description')
 
-        if not all([name, email, stack, experience]):
+        if not all([name, email, role, industry, experience]):
             return jsonify({"error": "Missing required fields"}), 400
+
+        if not isinstance(role, str) or not role.strip():
+            return jsonify({"error": "role must be a non-empty string"}), 400
+        if not isinstance(industry, str) or not industry.strip():
+            return jsonify({"error": "industry must be a non-empty string"}), 400
+        if not isinstance(experience, dict):
+            return jsonify({"error": "experience must be an object of {skill: years}"}), 400
+        role = role.strip()
+        industry = industry.strip()
+        if len(role) > 100:
+            return jsonify({"error": "role exceeds maximum length of 100 characters"}), 400
+        if len(industry) > 100:
+            return jsonify({"error": "industry exceeds maximum length of 100 characters"}), 400
+
+        if job_description is not None and not isinstance(job_description, str):
+            return jsonify({"error": "job_description must be a string"}), 400
+        if job_description is not None:
+            job_description = job_description.strip()
+            MAX_JD_LENGTH = 20000
+            if len(job_description) > MAX_JD_LENGTH:
+                return jsonify({
+                    "error": (
+                        "Job description exceeds maximum length of "
+                        f"{MAX_JD_LENGTH} characters"
+                    ),
+                    "current_length": len(job_description),
+                    "max_length": MAX_JD_LENGTH
+                }), 400
 
         # Find or create user
         user = User.query.filter_by(email=email).first()
@@ -32,12 +62,20 @@ def generate_interview():
         # history on a second sqlite connection (see resolve_database_url), and
         # an uncommitted flush would hold a write lock -> "database is locked".
         # On generation failure the interview is deleted so nothing is persisted.
-        interview = Interview(user_id=user.id, tech_stack=stack, experience_levels=experience)
+        interview = Interview(
+            user_id=user.id,
+            role=role,
+            industry=industry,
+            experience_levels=experience,
+            job_description=job_description or None
+        )
         db.session.add(interview)
         db.session.commit()
 
         # Generate Questions
-        questions_data = get_gemini_service().generate_questions(stack, experience, interview.id)
+        questions_data = get_gemini_service().generate_questions(
+            role, industry, experience, interview.id, job_description
+        )
 
         if not questions_data:
             db.session.delete(interview)
@@ -195,6 +233,8 @@ def evaluate_answer(answer_id):
         if not question:
             return jsonify({"error": "Question not found"}), 404
 
+        interview = db.session.get(Interview, question.interview_id)
+
         # Evaluate using LangChain — passes interview_id for DB-backed session memory
         evaluation = get_gemini_service().evaluate_answer(
             question_text=question.text,
@@ -202,6 +242,7 @@ def evaluate_answer(answer_id):
             question_difficulty=question.difficulty,
             answer_text=answer.answer_text,
             interview_id=question.interview_id,
+            job_description=interview.job_description if interview else None,
         )
 
         # Update answer with AI evaluation
