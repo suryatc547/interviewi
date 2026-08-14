@@ -4,7 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from config import Config
-from controllers.qc_controller import interview_bp
+from controllers.interview_controller import interview_bp
 from models.models import db
 
 

@@ -1,11 +1,11 @@
 ---
 name: gemini-langchain
-description: Use when working with the AI integration in qc-api/services/gemini_service.py — the LangChain LCEL chain, DB-backed session history keyed by interview_id, JSON output parsing, or stubbed verification of Gemini calls. Trigger keywords: "Gemini", "LangChain", "LCEL", "LLM chain", "chat history", "JsonOutputParser", "RunnableWithMessageHistory", "generate questions", "evaluate answer".
+description: Use when working with the AI integration in interviewi-api/services/gemini_service.py — the LangChain LCEL chain, DB-backed session history keyed by interview_id, JSON output parsing, or stubbed verification of Gemini calls. Trigger keywords: "Gemini", "LangChain", "LCEL", "LLM chain", "chat history", "JsonOutputParser", "RunnableWithMessageHistory", "generate questions", "evaluate answer".
 ---
 
 # GeminiService (LangChain) patterns
 
-The AI layer is `GeminiService` in `qc-api/services/gemini_service.py`. It is a **lazy singleton**: import `get_gemini_service()` and call it — nothing is created at import time, so the app boots without `GOOGLE_API_KEY`. Model comes from `GEMINI_MODEL` env var (default `gemini-2.5-flash`); the DB URL is resolved by `config.resolve_database_url()` (never read raw `DATABASE_URL` here).
+The AI layer is `GeminiService` in `interviewi-api/services/gemini_service.py`. It is a **lazy singleton**: import `get_gemini_service()` and call it — nothing is created at import time, so the app boots without `GOOGLE_API_KEY`. Model comes from `GEMINI_MODEL` env var (default `gemini-2.5-flash`); the DB URL is resolved by `config.resolve_database_url()` (never read raw `DATABASE_URL` here).
 
 ## Canonical chain + history pattern (copy this, don't reinvent)
 
@@ -60,7 +60,7 @@ The LLM's parsed JSON is untrusted — validate before it reaches the DB/results
 
 ## Verifying without a real API key / quota
 
-The repo has a real pytest suite — **run it**: `python -m pytest -q` from `qc-api/`. The `StubLLM` in `tests/conftest.py` replaces the model and `tests/conftest.py` points `DATABASE_URL` at a temp file before importing the app, so tests need no network/key. Use it as the pattern for any new behavior:
+The repo has a real pytest suite — **run it**: `python -m pytest -q` from `interviewi-api/`. The `StubLLM` in `tests/conftest.py` replaces the model and `tests/conftest.py` points `DATABASE_URL` at a temp file before importing the app, so tests need no network/key. Use it as the pattern for any new behavior:
 
 ```python
 # tests/conftest.py — StubLLM is a CALLABLE (LCEL needs a Runnable/callable/dict):

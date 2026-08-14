@@ -15,7 +15,7 @@ def resolve_database_url(url=None):
     A relative sqlite path (`sqlite:///interview.db`) is ambiguous: Flask
     resolves it under `<app>/instance`, while a raw SQLAlchemy engine resolves
     it against the process CWD — producing two different DB files. Normalize it
-    to an absolute path under qc-api/instance so both engines agree.
+    to an absolute path under interviewi-api/instance so both engines agree.
     """
     url = url or os.getenv(
         "DATABASE_URL", "postgresql://postgres:password@localhost/interviewi"

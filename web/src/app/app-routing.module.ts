@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { InterviewFormComponent } from './components/qc-form/qc-form.component';
+import { InterviewFormComponent } from './components/interview-form/interview-form.component';
 import { QuestionAnswerComponent } from './components/question-answer/question-answer.component';
 import { ResultsComponent } from './components/results/results.component';
 

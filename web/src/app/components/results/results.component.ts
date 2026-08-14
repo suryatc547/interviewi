@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Question } from '../../models/question.model';
-import { InterviewService } from '../../services/qc.service';
+import { InterviewService } from '../../services/interview.service';
 
 @Component({
   selector: 'app-results',

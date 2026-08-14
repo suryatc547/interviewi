@@ -10,7 +10,7 @@ Mono-repo with two applications:
 
 | App | Tech | Port | Location |
 | --- | --- | --- | --- |
-| `qc-api` | Python 3.8+, Flask, SQLAlchemy (SQLite/PostgreSQL), LangChain + `langchain-google-genai` | 5000 | `qc-api/` |
+| `interviewi-api` | Python 3.8+, Flask, SQLAlchemy (SQLite/PostgreSQL), LangChain + `langchain-google-genai` | 5000 | `interviewi-api/` |
 | `web` | Angular (NgModule, RxJS, plain CSS) | 4200 | `web/` |
 
 Supporting docs in the repo root: `QUICK_START.md`, `WIZARD_FLOW_DOCUMENTATION.md`, `IMPLEMENTATION_SUMMARY.md`, `FEATURE_DOCUMENTATION.md`, `changes/implementation_plan_*.md`.
@@ -18,7 +18,7 @@ Supporting docs in the repo root: `QUICK_START.md`, `WIZARD_FLOW_DOCUMENTATION.m
 ## Repository layout
 
 ```
-qc-api/
+interviewi-api/
   app.py                       # Flask app factory (create_app), CORS, blueprint registration, logging setup
   config.py                    # Config class + resolve_database_url(); DATABASE_URL, GOOGLE_API_KEY, GEMINI_MODEL
   requirements.txt             # PINNED runtime deps
@@ -27,7 +27,7 @@ qc-api/
   ruff.toml
   .env                         # LOCAL ONLY, gitignored — GOOGLE_API_KEY, DATABASE_URL, etc.
   models/models.py             # SQLAlchemy models: User, Interview, Question, Answer
-  controllers/qc_controller.py # Blueprint interview_bp, url_prefix /api/interview
+  controllers/interview_controller.py # Blueprint interview_bp, url_prefix /api/interview
   services/gemini_service.py   # GeminiService (LangChain LCEL) + DB-backed chat history
   tests/
     conftest.py                # test app/client fixtures + StubLLM (set env before importing app)
@@ -51,11 +51,11 @@ web/
       models/
         question.model.ts      # shared Question + QuestionAnswer interfaces
       components/
-        qc-form/               # class InterviewFormComponent, selector app-interview-form
+        interview-form/         # class InterviewFormComponent, selector app-interview-form
         question-answer/       # QuestionAnswerComponent
         results/               # ResultsComponent
       services/
-        qc.service.ts          # class InterviewService (note: file/class names differ)
+        interview.service.ts   # class InterviewService
 ```
 
 ## Frontend routes
@@ -86,14 +86,14 @@ web/
   - Model comes from `GEMINI_MODEL` env var (default `gemini-2.5-flash`).
   - Session history is stored in the `langchain_chat_history` table keyed by `interview_id` and managed through `_invoke_with_history`.
   - DB engine: built from `config.resolve_database_url()`; `connect_args={"check_same_thread": False}` is passed **only for sqlite URLs**; never for Postgres.
-- **Environment**: `qc-api/.env` is gitignored. `config.py` defaults `DATABASE_URL` to Postgres (`postgresql://postgres:password@localhost/interviewi`) but the checked-in `.env` uses `sqlite:///interview.db`. `.env.example` lists the keys including `GEMINI_MODEL`. A relative sqlite URL is normalized to an absolute path under `qc-api/instance/` by `resolve_database_url()` so Flask-SQLAlchemy and `GeminiService` share the same file.
+- **Environment**: `interviewi-api/.env` is gitignored. `config.py` defaults `DATABASE_URL` to Postgres (`postgresql://postgres:password@localhost/interviewi`) but the checked-in `.env` uses `sqlite:///interview.db`. `.env.example` lists the keys including `GEMINI_MODEL`. A relative sqlite URL is normalized to an absolute path under `interviewi-api/instance/` by `resolve_database_url()` so Flask-SQLAlchemy and `GeminiService` share the same file.
 
 ## Conventions — frontend
 
 - **NgModule, not standalone.** Add new components to `app.module.ts` declarations and to `AppModule` imports if they need modules. Do not add to `main.ts`.
 - **One folder per component** under `src/app/components/` with `name.component.{ts,css,html}` files.
 - **Shared types** go in `src/app/models/` (e.g. `Question`); do not redefine interfaces per component.
-- **Service**: `InterviewService` (in `qc.service.ts`, `providedIn: 'root'`) wraps all `HttpClient` calls to `environment.apiUrl` (see `src/environments/`).
+- **Service**: `InterviewService` (in `interview.service.ts`, `providedIn: 'root'`) wraps all `HttpClient` calls to `environment.apiUrl` (see `src/environments/`).
 - **Subscription style**: components use the `{ next, error }` observer-object form. Errors read `error.error?.error` (backend envelope) with a fallback message. No `pipe`/`takeUntil`/`async pipe` usage anywhere — match that style.
 - **Forms**: reactive `FormBuilder` in `InterviewFormComponent` (dynamic nested `FormGroup` for `experience`); template-driven `[(ngModel)]` in `QuestionAnswerComponent`.
 - **CSS**: plain global CSS in `styles.css`; each component has scoped CSS. Bootstrap-style class names (`btn`, `form-control`) are used but Bootstrap is **not installed** — styles are defined in component CSS.
@@ -101,7 +101,7 @@ web/
 ## Commands
 
 ```bash
-# Backend (from qc-api/)
+# Backend (from interviewi-api/)
 python -m venv venv                      # first time; activate: .\venv\Scripts\Activate (Win)
 pip install -r requirements-dev.txt      # runtime + dev deps (pytest, ruff)
 python -m pytest -q                      # 31 tests: guardrails, service round-trips, API routes
@@ -118,16 +118,16 @@ npm run lint                             # eslint
 npm run format                           # prettier --write
 ```
 
-- **Testing**: backend uses pytest (see `tests/`); the `StubLLM` in `tests/conftest.py` replaces `ChatGoogleGenerativeAI` so tests need no network/API key. Frontend has `qc.service.spec.ts` (HttpClientTestingModule) and a `qc-form.component.spec.ts` smoke test. Match those patterns when adding features.
+- **Testing**: backend uses pytest (see `tests/`); the `StubLLM` in `tests/conftest.py` replaces `ChatGoogleGenerativeAI` so tests need no network/API key. Frontend has `interview.service.spec.ts` (HttpClientTestingModule) and a `interview-form.component.spec.ts` smoke test. Match those patterns when adding features.
 - **Lint**: backend `ruff` (see `ruff.toml`), frontend `eslint` + `prettier`. Match the surrounding style.
 
 ## Known gotchas / landmines
 
-1. **Two engines, one URL**: Flask-SQLAlchemy and `GeminiService` each create their own engine. `config.resolve_database_url()` normalizes a relative sqlite path to `qc-api/instance/` so both point at the same file — don't bypass it (e.g. reading raw `DATABASE_URL` in `gemini_service`).
+1. **Two engines, one URL**: Flask-SQLAlchemy and `GeminiService` each create their own engine. `config.resolve_database_url()` normalizes a relative sqlite path to `interviewi-api/instance/` so both point at the same file — don't bypass it (e.g. reading raw `DATABASE_URL` in `gemini_service`).
 2. **Sqlite single-writer**: two concurrent *write* transactions on one sqlite file raise `database is locked`. `POST /generate` therefore **commits the interview before** calling `generate_questions` (which writes chat history on the service's own connection), and deletes the interview on failure.
 3. **Postgres is the config default**: if `DATABASE_URL` is unset or points at Postgres, everything goes through psycopg2 — never pass `check_same_thread` (rejected by psycopg2 as `invalid dsn`).
 4. **`generate_questions` returns `[]` on failure** — it swallows exceptions. The controller treats an empty result as a failure (`502` + interview deletion) so no empty interview is persisted.
 5. **History writes are non-atomic** (read-modify-write on a JSON blob) — concurrent evaluate calls on the same interview can lose turns. Fine for single-user flows.
-6. **Frontend naming mismatches**: folder `qc-form` → class `InterviewFormComponent`; file `qc.service.ts` → class `InterviewService`. Don't "fix" these silently.
+6. **Frontend naming is now aligned**: folder `interview-form/` ↔ class `InterviewFormComponent`; file `interview.service.ts` ↔ class `InterviewService`. Keep it that way for new components/services.
 7. **API URL is not hardcoded anymore** — it comes from `src/environments/` (per-build `fileReplacements`). The backend must run on port 5000 and CORS must stay enabled (adjust `environment.*.ts` if that ever changes).
 8. **`requirements.txt` is pinned** — don't bump LangChain/other deps without re-running the pytest suite (chain/history behavior is version-sensitive).

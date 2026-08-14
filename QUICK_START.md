@@ -4,7 +4,7 @@
 
 ### Step 1: Start Backend
 ```bash
-cd qc-api
+cd interviewi-api
 python app.py
 ```
 Backend runs on: **http://localhost:5000**
@@ -92,11 +92,11 @@ Results Page → View Score → See Feedback
 ## 📁 Project Structure
 
 ```
-qc-api/
+interviewi-api/
   ├── app.py                    # Flask app entry
   ├── models/models.py          # Database models
   ├── controllers/
-  │   └── qc_controller.py      # API endpoints
+  │   └── interview_controller.py # API endpoints
   └── services/
       └── gemini_service.py     # AI integration
 
@@ -104,11 +104,11 @@ web/
   ├── src/app/
   │   ├── app-routing.module.ts      # Routes
   │   ├── components/
-  │   │   ├── qc-form/               # Home page
+  │   │   ├── interview-form/        # Home page
   │   │   ├── question-answer/       # Answer page
   │   │   └── results/               # Results page
   │   ├── services/
-  │   │   └── qc.service.ts          # API calls
+  │   │   └── interview.service.ts   # API calls
   │   └── environments/              # environment.ts + environment.prod.ts
 ```
 
@@ -131,19 +131,19 @@ web/
 
 ```bash
 # Install backend dependencies (runtime + dev)
-cd qc-api && pip install -r requirements-dev.txt
+cd interviewi-api && pip install -r requirements-dev.txt
 
 # Install frontend dependencies
 cd web && npm install
 
 # Run backend
-cd qc-api && python app.py
+cd interviewi-api && python app.py
 
 # Run frontend
 cd web && npm start
 
 # Backend tests + lint
-cd qc-api && python -m pytest -q && python -m ruff check .
+cd interviewi-api && python -m pytest -q && python -m ruff check .
 
 # Frontend tests + lint + build
 cd web && npm run test:ci && npm run lint && npm run build
@@ -153,7 +153,7 @@ cd web && npm run test:ci && npm run lint && npm run build
 
 ## 🔑 Environment Setup
 
-Create `qc-api/.env` (see `.env.example`):
+Create `interviewi-api/.env` (see `.env.example`):
 ```env
 GOOGLE_API_KEY=your_gemini_api_key
 DATABASE_URL=sqlite:///interview.db

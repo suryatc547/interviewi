@@ -5,11 +5,11 @@ description: Use when the user asks to run, start, restart, or troubleshoot the 
 
 # Run the Interview Wizard dev stack
 
-The app is a mono-repo: `qc-api/` (Flask backend, port 5000) and `web/` (Angular frontend, port 4200). The frontend **requires** the backend on `localhost:5000` — the API URL comes from `web/src/environments/environment.ts` (`apiUrl`, default `http://localhost:5000/api/interview`), swapped via `fileReplacements` for prod builds.
+The app is a mono-repo: `interviewi-api/` (Flask backend, port 5000) and `web/` (Angular frontend, port 4200). The frontend **requires** the backend on `localhost:5000` — the API URL comes from `web/src/environments/environment.ts` (`apiUrl`, default `http://localhost:5000/api/interview`), swapped via `fileReplacements` for prod builds.
 
-## Backend (`qc-api/`)
+## Backend (`interviewi-api/`)
 
-1. **Environment file** — `qc-api/.env` must exist (it is gitignored). If missing, copy `.env.example` and fill in at least `GOOGLE_API_KEY`. The checked-in `.env` uses `DATABASE_URL=sqlite:///interview.db` (resolved under `qc-api/instance/`). Optional `GEMINI_MODEL` overrides the model (default `gemini-2.5-flash`). If `DATABASE_URL` is unset, `config.py` defaults to a Postgres URL that will not work locally without a Postgres server.
+1. **Environment file** — `interviewi-api/.env` must exist (it is gitignored). If missing, copy `.env.example` and fill in at least `GOOGLE_API_KEY`. The checked-in `.env` uses `DATABASE_URL=sqlite:///interview.db` (resolved under `interviewi-api/instance/`). Optional `GEMINI_MODEL` overrides the model (default `gemini-2.5-flash`). If `DATABASE_URL` is unset, `config.py` defaults to a Postgres URL that will not work locally without a Postgres server.
 2. **Virtualenv** — create/activate once:
    ```bash
    python -m venv venv            # first time only
@@ -21,7 +21,7 @@ The app is a mono-repo: `qc-api/` (Flask backend, port 5000) and `web/` (Angular
    python app.py                  # Flask dev server on http://localhost:5000
    ```
    `app.py` builds the app via `create_app()`, configures logging, runs `db.create_all()`, and logs to stdout. `use_reloader=False` — restart manually after Python changes.
-4. **Sanity checks** (before/after changes): `python -m pytest -q` and `python -m ruff check .` (both from `qc-api/`).
+4. **Sanity checks** (before/after changes): `python -m pytest -q` and `python -m ruff check .` (both from `interviewi-api/`).
 
 ## Frontend (`web/`)
 
@@ -50,4 +50,4 @@ npm start                         # ng serve on http://localhost:4200
 | Frontend gets CORS / connection errors | Backend not running on port 5000, or CORS disabled in `app.py`. |
 | Empty interview created (`questions: []`) | Generation failed (missing API key, quota). `generate_questions` returns `[]`; the controller deletes the interview and returns `502` so nothing is persisted. |
 | Stale behavior after backend edits | `app.py` runs with `use_reloader=False` — restart the process. |
-| Two sqlite files confused | `resolve_database_url()` normalizes relative sqlite to `qc-api/instance/` so Flask-SQLAlchemy and `GeminiService` share one file. If data looks "lost", check you're not bypassing it (raw `DATABASE_URL` reads). |
+| Two sqlite files confused | `resolve_database_url()` normalizes relative sqlite to `interviewi-api/instance/` so Flask-SQLAlchemy and `GeminiService` share one file. If data looks "lost", check you're not bypassing it (raw `DATABASE_URL` reads). |

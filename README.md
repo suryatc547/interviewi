@@ -16,7 +16,7 @@ This application allows users to generate customized technical interview questio
 
 The project is structured as a mono-repo divided into two main applications:
 
-- **qc-api (Backend)**: Python Flask API utilizing SQLAlchemy (SQLite/PostgreSQL) and LangChain for AI integration.
+- **interviewi-api (Backend)**: Python Flask API utilizing SQLAlchemy (SQLite/PostgreSQL) and LangChain for AI integration.
 - **web (Frontend)**: Angular 16 Single Page Application with custom CSS, glassmorphism UI, and RxJS state management.
 
 ---
@@ -28,9 +28,9 @@ The project is structured as a mono-repo divided into two main applications:
 - Node.js 18+ & npm
 - Google Gemini API Key
 
-### 1. Backend Setup (`qc-api`)
+### 1. Backend Setup (`interviewi-api`)
 ```bash
-cd qc-api
+cd interviewi-api
 python -m venv venv
 # Windows: .\venv\Scripts\Activate
 # Mac/Linux: source venv/bin/activate
@@ -56,7 +56,7 @@ npm start
 
 ### 3. Tests & lint
 ```bash
-# Backend (from qc-api/)
+# Backend (from interviewi-api/)
 python -m pytest -q        # 31 tests
 python -m ruff check .
 

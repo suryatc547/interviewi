@@ -69,7 +69,7 @@ A complete refactor of the interview application from a single-page to a multi-p
     - Timestamps
 
 #### 2. API Endpoints
-- **Updated `controllers/qc_controller.py`**:
+- **Updated `controllers/interview_controller.py`**:
   - `GET /api/interview/questions/<interview_id>` - Fetch questions
   - `POST /api/interview/answer` - Submit answer
   - `POST /api/interview/evaluate/<answer_id>` - AI evaluation
@@ -89,11 +89,11 @@ A complete refactor of the interview application from a single-page to a multi-p
 3. **`interview-form.component.ts`** - Navigate after generation
 4. **`interview-form.component.html`** - Removed question list display
 5. **`interview-form.component.css`** - Added error message styling
-6. **`services/qc.service.ts`** - Added new API methods
+6. **`services/interview.service.ts`** - Added new API methods
 
 ### Backend
 7. **`models/models.py`** - Added Answer model
-8. **`controllers/qc_controller.py`** - Fixed question ID issue, added endpoints
+8. **`controllers/interview_controller.py`** - Fixed question ID issue, added endpoints
 9. **`services/gemini_service.py`** - Added evaluation method
 
 ---
@@ -271,7 +271,7 @@ Response: {
 ## 🧪 Testing Checklist
 
 ### Backend Testing
-- [ ] Start Flask server: `cd qc-api && python app.py`
+- [ ] Start Flask server: `cd interviewi-api && python app.py`
 - [ ] Database tables created automatically
 - [ ] Questions generation working
 - [ ] Answer submission endpoint works
@@ -308,7 +308,7 @@ Response: {
 1. **Fixed null question.id issue**
    - Problem: `question.id` was null in response
    - Solution: Build response array after `db.session.commit()`
-   - Location: `qc_controller.py`
+    - Location: `interview_controller.py`
 
 ---
 
@@ -329,7 +329,7 @@ Response: {
 
 ### Backend Setup
 ```bash
-cd qc-api
+cd interviewi-api
 pip install -r requirements-dev.txt
 python app.py
 # Server runs on http://localhost:5000
@@ -344,7 +344,7 @@ npm start
 ```
 
 ### Environment Variables
-Create `qc-api/.env`:
+Create `interviewi-api/.env`:
 ```
 GOOGLE_API_KEY=your_gemini_api_key_here
 DATABASE_URL=sqlite:///interview.db

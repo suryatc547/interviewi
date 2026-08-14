@@ -5,10 +5,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { InterviewFormComponent } from './components/qc-form/qc-form.component';
+import { InterviewFormComponent } from './components/interview-form/interview-form.component';
 import { QuestionAnswerComponent } from './components/question-answer/question-answer.component';
 import { ResultsComponent } from './components/results/results.component';
-import { InterviewService } from './services/qc.service';
+import { InterviewService } from './services/interview.service';
 
 @NgModule({
   declarations: [

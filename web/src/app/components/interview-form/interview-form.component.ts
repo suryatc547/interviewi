@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { InterviewService } from '../../services/qc.service';
+import { InterviewService } from '../../services/interview.service';
 
 @Component({
   selector: 'app-interview-form',
-  templateUrl: './qc-form.component.html',
-  styleUrls: ['./qc-form.component.css']
+  templateUrl: './interview-form.component.html',
+  styleUrls: ['./interview-form.component.css']
 })
 export class InterviewFormComponent {
   interviewForm: FormGroup;

@@ -191,7 +191,7 @@ def evaluate_answer(answer_id):
         if not answer:
             return jsonify({"error": "Answer not found"}), 404
 
-        question = Question.query.get(answer.question_id)
+        question = db.session.get(Question, answer.question_id)
         if not question:
             return jsonify({"error": "Question not found"}), 404
 

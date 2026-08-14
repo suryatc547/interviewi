@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { InterviewFormComponent } from './qc-form.component';
-import { InterviewService } from '../../services/qc.service';
+import { InterviewFormComponent } from './interview-form.component';
+import { InterviewService } from '../../services/interview.service';
 
 describe('InterviewFormComponent', () => {
   let component: InterviewFormComponent;
