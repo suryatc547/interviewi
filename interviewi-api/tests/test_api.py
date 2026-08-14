@@ -2,9 +2,16 @@ def _generate_body():
     return {
         "name": "Alice",
         "email": "alice@example.com",
-        "stack": "Python, Flask",
+        "role": "Backend Engineer",
+        "industry": "Technology",
         "experience": {"Python": "3", "Flask": "2"},
     }
+
+
+def _generate_body_with_jd(job_description):
+    body = _generate_body()
+    body["job_description"] = job_description
+    return body
 
 
 class TestGenerate:
@@ -28,6 +35,33 @@ class TestGenerate:
         assert resp.status_code == 400
         assert "Missing required fields" in resp.get_json()["error"]
 
+    def test_role_industry_must_be_strings_400(self, app, client):
+        body = _generate_body()
+        body["role"] = 123
+        resp = client.post("/api/interview/generate", json=body)
+        assert resp.status_code == 400
+        assert "role must be a non-empty string" in resp.get_json()["error"]
+
+        body = _generate_body()
+        body["industry"] = 123
+        resp = client.post("/api/interview/generate", json=body)
+        assert resp.status_code == 400
+        assert "industry must be a non-empty string" in resp.get_json()["error"]
+
+    def test_experience_must_be_dict_400(self, app, client):
+        body = _generate_body()
+        body["experience"] = "not-a-dict"
+        resp = client.post("/api/interview/generate", json=body)
+        assert resp.status_code == 400
+        assert "experience must be an object" in resp.get_json()["error"]
+
+    def test_role_too_long_400(self, app, client):
+        body = _generate_body()
+        body["role"] = "r" * 101
+        resp = client.post("/api/interview/generate", json=body)
+        assert resp.status_code == 400
+        assert "role exceeds maximum length" in resp.get_json()["error"]
+
     def test_empty_questions_502_and_rollback(self, app, client, stub_llm):
         stub_llm({"questions": []})
         resp = client.post("/api/interview/generate", json=_generate_body())
@@ -45,6 +79,62 @@ class TestGenerate:
         from models.models import User
         with app.app_context():
             assert User.query.filter_by(email="alice@example.com").count() == 1
+
+
+class TestGenerateWithJd:
+    JD = (
+        "Senior Python Engineer. Responsibilities include designing Flask APIs "
+        "and leading a team of four engineers."
+    )
+
+    def test_success_stores_jd(self, app, client, stub_llm):
+        stub_llm({"questions": [{"text": "Q1", "topic": "Python", "difficulty": "easy"}]})
+        resp = client.post(
+            "/api/interview/generate", json=_generate_body_with_jd(self.JD)
+        )
+        assert resp.status_code == 201
+        from models.models import Interview
+        with app.app_context():
+            interview = Interview.query.filter_by(id=resp.get_json()["interview_id"]).first()
+            assert interview.job_description == self.JD
+
+    def test_optional_jd_is_none(self, app, client, stub_llm):
+        stub_llm({"questions": [{"text": "Q1", "topic": "Python", "difficulty": "easy"}]})
+        resp = client.post("/api/interview/generate", json=_generate_body())
+        assert resp.status_code == 201
+        from models.models import Interview
+        with app.app_context():
+            interview = Interview.query.filter_by(id=resp.get_json()["interview_id"]).first()
+            assert interview.job_description is None
+
+    def test_jd_too_long_400(self, app, client):
+        resp = client.post(
+            "/api/interview/generate",
+            json=_generate_body_with_jd("x" * 20001),
+        )
+        assert resp.status_code == 400
+        assert "exceeds maximum length" in resp.get_json()["error"]
+
+    def test_jd_non_string_400(self, app, client):
+        resp = client.post(
+            "/api/interview/generate", json=_generate_body_with_jd(123)
+        )
+        assert resp.status_code == 400
+        assert "job_description must be a string" in resp.get_json()["error"]
+
+    def test_jd_grounding_used_in_generation(self, app, client, stub_llm):
+        stub_llm({"questions": [{"text": "Q1", "topic": "Python", "difficulty": "easy"}]})
+        resp = client.post(
+            "/api/interview/generate", json=_generate_body_with_jd(self.JD)
+        )
+        assert resp.status_code == 201
+        from services.gemini_service import get_gemini_service
+        messages = get_gemini_service()._get_session_history(
+            resp.get_json()["interview_id"]
+        ).messages
+        prompt = messages[-2].content if len(messages) >= 2 else ""
+        assert "<job_description>" in prompt
+        assert "Flask APIs" in prompt
 
 
 class TestGetQuestions:

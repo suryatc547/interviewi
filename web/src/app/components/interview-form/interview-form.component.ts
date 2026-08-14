@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InterviewService } from '../../services/interview.service';
 
@@ -13,15 +13,6 @@ export class InterviewFormComponent {
   loading = false;
   errorMessage = '';
 
-  techStacks = ['MEAN', 'MERN', 'Java Fullstack', 'Python Fullstack'];
-  
-  stackTechnologies: { [key: string]: string[] } = {
-    'MEAN': ['MongoDB', 'Express.js', 'Angular', 'Node.js'],
-    'MERN': ['MongoDB', 'Express.js', 'React', 'Node.js'],
-    'Java Fullstack': ['Java', 'Spring Boot', 'SQL', 'Angular/React'],
-    'Python Fullstack': ['Python', 'Django/Flask', 'SQL', 'Angular/React']
-  };
-
   constructor(
     private fb: FormBuilder,
     private interviewService: InterviewService,
@@ -30,38 +21,51 @@ export class InterviewFormComponent {
     this.interviewForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      stack: ['', Validators.required],
-      experience: this.fb.group({})
+      role: ['', Validators.required],
+      industry: ['', Validators.required],
+      skills: this.fb.array([], Validators.required),
+      job_description: ['']
     });
 
-    this.interviewForm.get('stack')?.valueChanges.subscribe(stack => {
-      this.updateExperienceFields(stack);
-    });
+    this.addSkill();
   }
 
-  updateExperienceFields(stack: string) {
-    const experienceGroup = this.fb.group({});
-    const techs = this.stackTechnologies[stack] || [];
-    techs.forEach(tech => {
-      experienceGroup.addControl(tech, this.fb.control('', Validators.required));
-    });
-    this.interviewForm.setControl('experience', experienceGroup);
+  get skills(): FormArray {
+    return this.interviewForm.get('skills') as FormArray;
   }
 
-  get experienceControls() {
-    return (this.interviewForm.get('experience') as FormGroup).controls;
+  addSkill(): void {
+    this.skills.push(this.fb.group({
+      skill: ['', Validators.required],
+      years: ['', [Validators.required, Validators.pattern(/^[0-9]+(\.[0-9]+)?$/)]]
+    }));
   }
 
-  getTechnologies() {
-    return Object.keys(this.experienceControls);
+  removeSkill(index: number): void {
+    this.skills.removeAt(index);
   }
 
   onSubmit() {
     if (this.interviewForm.valid) {
       this.loading = true;
       this.errorMessage = '';
-      
-      this.interviewService.generateQuestions(this.interviewForm.value).subscribe({
+
+      const formValue = this.interviewForm.value;
+      const experience: { [skill: string]: string } = {};
+      for (const row of formValue.skills) {
+        if (row.skill && row.skill.trim()) {
+          experience[row.skill.trim()] = row.years;
+        }
+      }
+
+      this.interviewService.generateQuestions({
+        name: formValue.name,
+        email: formValue.email,
+        role: formValue.role,
+        industry: formValue.industry,
+        experience,
+        job_description: formValue.job_description
+      }).subscribe({
         next: (response: any) => {
           this.loading = false;
           // Navigate to the question answering page
@@ -76,4 +80,3 @@ export class InterviewFormComponent {
     }
   }
 }
-

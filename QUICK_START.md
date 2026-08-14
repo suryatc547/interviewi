@@ -167,7 +167,7 @@ GEMINI_MODEL=gemini-2.5-flash
 ```bash
 # Generate questions
 POST /api/interview/generate
-Body: { name, email, stack, experience }
+Body: { name, email, role, industry, experience: {skill: years}, job_description }
 
 # Get questions
 GET /api/interview/questions/:id

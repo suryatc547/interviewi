@@ -1,6 +1,6 @@
 ---
 name: gemini-langchain
-description: Use when working with the AI integration in interviewi-api/services/gemini_service.py — the LangChain LCEL chain, DB-backed session history keyed by interview_id, JSON output parsing, or stubbed verification of Gemini calls. Trigger keywords: "Gemini", "LangChain", "LCEL", "LLM chain", "chat history", "JsonOutputParser", "RunnableWithMessageHistory", "generate questions", "evaluate answer".
+description: Use when working with the AI integration in interviewi-api/services/gemini_service.py — the LangChain LCEL chain, DB-backed session history keyed by interview_id, JSON output parsing, JD-grounded (RAG) generation, or stubbed verification of Gemini calls. Trigger keywords: "Gemini", "LangChain", "LCEL", "LLM chain", "chat history", "JsonOutputParser", "RunnableWithMessageHistory", "generate questions", "evaluate answer", "job description", "JD", "RAG".
 ---
 
 # GeminiService (LangChain) patterns
@@ -57,6 +57,16 @@ The LLM's parsed JSON is untrusted — validate before it reaches the DB/results
 - `_normalize_score(value)` (`gemini_service.py`): coerce to int, clamp to 0-10. Handles numeric strings (`"9"` → 9), floats (`8.6` → 9), out-of-range (`15` → 10), and garbage (`"abc"`, `True`, `None` → 0).
 - `_clean_questions(raw)` (`gemini_service.py`): keep only dicts with non-empty `text`, coerce `topic` to str, and normalize `difficulty` to `Easy|Medium|Hard` (unknown → `Medium`).
 - `strengths`/`improvements`/`feedback`: only accept lists/strings of the right type — a string passed to a list comprehension iterates **character-by-character** (`"nope"` → `['n','o','p','e']`).
+
+## JD-grounded questions (RAG)
+
+`job_description` is optional (stored on `Interview`). When provided, `GeminiService._build_jd_context()` sanitizes/chunks/retrieves it via `services/jd_retriever.py` and injects a data-only `<job_description>` block into the user input of both `generate_questions` and `evaluate_answer`:
+
+- `sanitize_jd(text, max_chars=20000)` — guardrail: non-string → `""`, strips control chars (keeps `\n`/`\t`), collapses spaces, truncates.
+- `chunk_jd(text, max_chars=600)` — sentence/newline-aware chunking; hard-wraps over-long sentences.
+- `retrieve_chunks(query, chunks, k)` — BM25 keyword scoring (deterministic, stable-tie order, no vector DB). Top-k `k` chunks are joined with `\n---\n` inside `<job_description>`.
+- The wrapped chunks are **untrusted data**: the system + user prompts both say so, mirroring `<candidate_profile>`. Never pass JD text to the model outside the data-only tags.
+- Empty JD / empty chunks → `""`, so non-JD flows are byte-identical to before.
 
 ## Verifying without a real API key / quota
 

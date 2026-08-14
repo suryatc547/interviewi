@@ -2,7 +2,7 @@
 
 An intelligent, multi-page technical interview simulator powered by Google Gemini AI. 
 
-This application allows users to generate customized technical interview questions based on their tech stack and experience. It guides them through a seamless question-by-question wizard, asynchronously evaluating their answers in the background, and provides comprehensive feedback and scoring upon completion.
+This application allows users to generate customized interview questions based on their target role, industry, and skills/experience (optionally grounded in a job description). It guides them through a seamless question-by-question wizard, asynchronously evaluating their answers in the background, and provides comprehensive feedback and scoring upon completion.
 
 ## 🌟 Features
 - **AI-Powered Question Generation**: Generates relevant technical questions using Google Gemini (default `gemini-2.5-flash`, configurable via `GEMINI_MODEL`).
