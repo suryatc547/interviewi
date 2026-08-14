@@ -34,6 +34,9 @@ class TestGenerate:
         resp = client.post("/api/interview/generate", json={"name": "Alice"})
         assert resp.status_code == 400
         assert "Missing required fields" in resp.get_json()["error"]
+        assert "name" not in resp.get_json()["error"]
+        for field in ("email", "role", "industry", "experience"):
+            assert field in resp.get_json()["error"]
 
     def test_role_industry_must_be_strings_400(self, app, client):
         body = _generate_body()
