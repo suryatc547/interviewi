@@ -25,6 +25,8 @@ Frontend runs on: **http://localhost:4200**
 | `/` | InterviewFormComponent | Generate interview questions |
 | `/interview/:id` | QuestionAnswerComponent | Answer questions one by one |
 | `/results/:id` | ResultsComponent | View scores and feedback |
+| `/ats` | ATSFormComponent | Upload resume + paste job description |
+| `/ats/results/:id` | ATSResultsComponent | View ATS score breakdown |
 
 ---
 
@@ -35,6 +37,7 @@ Frontend runs on: **http://localhost:4200**
 2. **Answer One-by-One** - Single question display with progress tracking
 3. **Auto-Save & Evaluate** - Background AI evaluation (non-blocking)
 4. **View Results** - Overall score + detailed feedback for each question
+5. **ATS Resume Scanner** - Upload PDF resume, paste job description, get compatibility score
 
 ### 🎨 UI Highlights
 - Progress bar showing completion
@@ -42,6 +45,9 @@ Frontend runs on: **http://localhost:4200**
 - Color-coded validation
 - Animated circular score display
 - Expandable feedback cards
+- ATS score circle with category breakdown
+- Keyword chips (matched/missing)
+- Drag-and-drop PDF upload
 - Responsive mobile design
 
 ---
@@ -94,11 +100,21 @@ Results Page → View Score → See Feedback
 ```
 interviewi-api/
   ├── app.py                    # Flask app entry
-  ├── models/models.py          # Database models
+  ├── models/models.py          # Database models (User, Interview, Question, Answer, ATSScan)
   ├── controllers/
-  │   └── interview_controller.py # API endpoints
-  └── services/
-      └── gemini_service.py     # AI integration
+  │   ├── interview_controller.py # Interview API endpoints
+  │   └── ats_controller.py      # ATS API endpoints
+  ├── services/
+  │   ├── gemini_service.py     # AI integration
+  │   ├── jd_retriever.py       # JD-driven question generation (RAG)
+  │   └── pdf_extractor.py      # PDF validation + text extraction
+  └── tests/
+      ├── test_guardrails.py    # Output guardrail tests
+      ├── test_gemini_service.py # AI service tests
+      ├── test_api.py           # Interview API tests
+      ├── test_ats_api.py       # ATS API tests
+      ├── test_ats_guardrails.py # ATS guardrail tests
+      └── test_pdf_extractor.py # PDF extractor tests
 
 web/
   ├── src/app/
@@ -106,7 +122,12 @@ web/
   │   ├── components/
   │   │   ├── interview-form/        # Home page
   │   │   ├── question-answer/       # Answer page
-  │   │   └── results/               # Results page
+  │   │   ├── results/               # Results page
+  │   │   ├── ats-form/              # ATS upload form
+  │   │   └── ats-results/           # ATS results display
+  │   ├── models/
+  │   │   ├── question.model.ts      # Question interfaces
+  │   │   └── ats.model.ts           # ATS result interface
   │   ├── services/
   │   │   └── interview.service.ts   # API calls
   │   └── environments/              # environment.ts + environment.prod.ts
@@ -164,6 +185,7 @@ GEMINI_MODEL=gemini-2.5-flash
 
 ## 📊 API Quick Reference
 
+### Interview API (`/api/interview`)
 ```bash
 # Generate questions
 POST /api/interview/generate
@@ -178,6 +200,16 @@ Body: { question_id, answer_text }
 
 # Evaluate answer
 POST /api/interview/evaluate/:answerId
+```
+
+### ATS API (`/api/ats`)
+```bash
+# Scan resume against job description
+POST /api/ats/scan
+Body: multipart/form-data { resume: PDF file, job_description: text }
+
+# Get saved scan
+GET /api/ats/scan/:scanId
 ```
 
 ---

@@ -7,6 +7,116 @@ This implementation adds comprehensive functionality for:
 - Storing answers in the database
 - Evaluating answers with AI and updating scores
 
+## ATS Resume Scanner Feature
+
+### Overview
+The ATS (Applicant Tracking System) scanner allows users to:
+- Upload a PDF resume
+- Paste a job description
+- Get an ATS compatibility score (0-100)
+- Receive keyword analysis and improvement suggestions
+
+### Backend Changes
+
+#### Database Model (`models/models.py`)
+```python
+class ATSScan(db.Model):
+    id: Primary key
+    user_id: Foreign key to User
+    resume_text: Extracted text from PDF (max 15000 chars)
+    job_description: User-provided JD (max 20000 chars)
+    overall_score: 0-100
+    keywords_score: 0-100
+    skills_score: 0-100
+    experience_score: 0-100
+    format_score: 0-100
+    matched_keywords: JSON array
+    missing_keywords: JSON array
+    suggestions: JSON array
+    created_at: Timestamp
+```
+
+#### API Endpoints (`controllers/ats_controller.py`)
+
+##### POST `/api/ats/scan`
+- **Content-Type**: `multipart/form-data`
+- **Fields**:
+  - `resume`: PDF file (required, max 2MB, max 50 pages)
+  - `job_description`: Text (required, max 20000 chars)
+- **Returns**: Full ATS analysis with scores and suggestions
+- **Errors**: 400 for validation, 502 for AI failure
+
+##### GET `/api/ats/scan/<scan_id>`
+- **Returns**: Previously saved scan results
+- **Errors**: 404 if scan not found
+
+#### PDF Extractor (`services/pdf_extractor.py`)
+- Validates PDF magic bytes (must start with `%PDF`)
+- Checks file size (2MB max)
+- Validates page count (50 pages max)
+- Extracts text page-by-page using PyPDF2
+- Sanitizes output (removes control chars, collapses whitespace)
+- Caps text at 15000 characters
+
+#### AI Service (`services/gemini_service.py`)
+- `analyze_ats()`: Stateless chain comparing resume to JD
+- Input guardrails: `_clip()` caps resume at 15K, JD at 20K
+- Output guardrails:
+  - `_validate_ats_result()`: Checks all 8 required keys
+  - `_normalize_score_100()`: Clamps scores to 0-100
+  - `_clean_keywords()`: Max 10 per list, lowercase
+  - `_clean_suggestions()`: Max 8 suggestions
+- Returns `None` on any failure (triggers 502 in controller)
+
+### Frontend Changes
+
+#### ATS Form Component (`components/ats-form/`)
+- PDF drag-and-drop upload area
+- Click-to-browse file selector
+- JD textarea with character counter (max 20000)
+- File validation feedback
+- Loading state during upload
+
+#### ATS Results Component (`components/ats-results/`)
+- Animated circular score display
+- Category breakdown bars (keywords, skills, experience, format)
+- Matched keywords chips (green)
+- Missing keywords chips (red)
+- Suggestions list
+- "Scan Another" button
+
+#### Models (`models/ats.model.ts`)
+```typescript
+interface ATSScanResult {
+  id: number;
+  overall_score: number;
+  keywords_score: number;
+  skills_score: number;
+  experience_score: number;
+  format_score: number;
+  matched_keywords: string[];
+  missing_keywords: string[];
+  suggestions: string[];
+}
+```
+
+#### Service Methods (`services/interview.service.ts`)
+- `scanATS(resume: File, jobDescription: string)`: FormData upload
+- `getATSScan(scanId: number)`: Fetch saved scan
+
+### Scoring Categories
+| Category | Weight | Description |
+|----------|--------|-------------|
+| Keywords | 30% | Match between resume and JD keywords |
+| Skills | 30% | Technical skills alignment |
+| Experience | 25% | Years and relevance of experience |
+| Format | 15% | Resume structure and formatting |
+
+### Error Handling
+- **400 Bad Request**: Invalid file type, file too large, missing fields
+- **404 Not Found**: Scan ID doesn't exist
+- **502 Bad Gateway**: AI service failure or invalid response
+
 ## Backend Changes
 
 ### 1. Database Models (`models/models.py`)

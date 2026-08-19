@@ -1,0 +1,56 @@
+<div class="ats-container">
+  <div class="form-section">
+    <h2>ATS Resume Scanner</h2>
+    <p class="subtitle">Upload your resume PDF and paste the job description to get an ATS compatibility score</p>
+
+    <form [formGroup]="atsForm" (ngSubmit)="onSubmit()">
+      <div class="columns">
+        <div class="column">
+          <div class="form-group">
+            <label>Your Resume (PDF only)</label>
+            <div class="upload-zone" [class.drag-over]="dragOver" [class.has-file]="selectedFile"
+              (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()"
+              (click)="fileInput.click()">
+              <input #fileInput type="file" accept=".pdf" (change)="onFileSelected($event)" hidden>
+
+              <div *ngIf="!selectedFile" class="upload-placeholder">
+                <div class="upload-icon">&#128196;</div>
+                <p class="upload-text">Click or drag a PDF file here</p>
+                <p class="upload-hint">Maximum file size: 2 MB</p>
+              </div>
+
+              <div *ngIf="selectedFile" class="file-info">
+                <div class="file-icon">&#9989;</div>
+                <div class="file-details">
+                  <span class="file-name">{{ fileName }}</span>
+                  <span class="file-size">{{ (selectedFile.size / 1024).toFixed(1) }} KB</span>
+                </div>
+                <button type="button" class="btn-remove-file" (click)="removeFile(); $event.stopPropagation()">
+                  &#10005;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="form-group">
+            <label for="job_description">Job Description</label>
+            <textarea id="job_description" formControlName="job_description" class="form-control"
+              rows="14" [maxlength]="MAX_JD_LENGTH"
+              placeholder="Paste the job description here...&#10;&#10;Include the full posting with requirements, responsibilities, and qualifications."></textarea>
+            <small class="field-hint">{{ jdCharCount }} / {{ MAX_JD_LENGTH }} characters</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="!selectedFile || !atsForm.valid || loading" class="btn btn-primary btn-scan">
+        {{ loading ? 'Analyzing...' : 'Scan My Resume' }}
+      </button>
+    </form>
+  </div>
+</div>

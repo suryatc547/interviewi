@@ -1,8 +1,10 @@
-# Implementation Summary - Multi-Page Interview Wizard
+# Implementation Summary - Multi-Page Interview Wizard & ATS Scanner
 
 ## 🎯 What Was Built
 
-A complete refactor of the interview application from a single-page to a multi-page wizard flow with AI-powered answer evaluation.
+A complete interview application with two main features:
+1. **Multi-Page Interview Wizard**: AI-powered question generation, one-at-a-time answering, and background evaluation.
+2. **ATS Resume Scanner**: PDF resume upload, job description analysis, and compatibility scoring.
 
 ---
 
@@ -40,6 +42,34 @@ A complete refactor of the interview application from a single-page to a multi-p
 
 ---
 
+## 📋 ATS Scanner Requirements
+
+✅ **PDF Resume Upload**
+- Drag-and-drop or click-to-upload
+- PDF validation (magic bytes, size, page count)
+- Text extraction with guardrails
+
+✅ **Job Description Input**
+- Textarea with character limit (20000)
+- Optional for future enhancements
+
+✅ **ATS Compatibility Scoring**
+- Overall score (0-100)
+- Category breakdowns: keywords, skills, experience, format
+- Score normalization and validation
+
+✅ **Keyword Analysis**
+- Matched keywords from resume
+- Missing keywords from JD
+- Max 10 per list, lowercase
+
+✅ **Improvement Suggestions**
+- AI-powered actionable recommendations
+- Max 8 suggestions
+- Clear, concise formatting
+
+---
+
 ## 🗂️ Files Created
 
 ### Frontend (Angular)
@@ -57,6 +87,19 @@ A complete refactor of the interview application from a single-page to a multi-p
 - **`components/results/results.component.html`** - Template
 - **`components/results/results.component.css`** - Styling
 
+#### 4. ATS Form Component (Resume upload)
+- **`components/ats-form/ats-form.component.ts`** - Logic
+- **`components/ats-form/ats-form.component.html`** - Template
+- **`components/ats-form/ats-form.component.css`** - Styling
+
+#### 5. ATS Results Component (Score breakdown)
+- **`components/ats-results/ats-results.component.ts`** - Logic
+- **`components/ats-results/ats-results.component.html`** - Template
+- **`components/ats-results/ats-results.component.css`** - Styling
+
+#### 6. ATS Model
+- **`models/ats.model.ts`** - ATSScanResult interface
+
 ### Backend (Flask)
 
 #### 1. Database Models
@@ -67,34 +110,59 @@ A complete refactor of the interview application from a single-page to a multi-p
     - `ai_score` (0-10)
     - `ai_feedback` (detailed evaluation)
     - Timestamps
+  - Added `ATSScan` model with fields:
+    - `user_id` (foreign key)
+    - `resume_text` (max 15000 chars)
+    - `job_description` (max 20000 chars)
+    - Score fields (0-100 each)
+    - JSON fields for keywords and suggestions
+    - Timestamps
 
 #### 2. API Endpoints
 - **Updated `controllers/interview_controller.py`**:
   - `GET /api/interview/questions/<interview_id>` - Fetch questions
   - `POST /api/interview/answer` - Submit answer
   - `POST /api/interview/evaluate/<answer_id>` - AI evaluation
+- **Created `controllers/ats_controller.py`**:
+  - `POST /api/ats/scan` - Analyze resume vs JD (multipart)
+  - `GET /api/ats/scan/<scan_id>` - Retrieve saved scan
 
 #### 3. AI Service
 - **Updated `services/gemini_service.py`**:
   - Added `evaluate_answer()` method
-  - Returns score, feedback, strengths, improvements
+  - Added `analyze_ats()` method
+  - Added ATS guardrail methods:
+    - `_validate_ats_result()`
+    - `_normalize_score_100()`
+    - `_clean_keywords()`
+    - `_clean_suggestions()`
+
+#### 4. PDF Extractor
+- **Created `services/pdf_extractor.py`**:
+  - PDF validation (magic bytes, size, page count)
+  - Text extraction using PyPDF2
+  - Output sanitization
 
 ---
 
 ## 🗂️ Files Modified
 
 ### Frontend
-1. **`app.module.ts`** - Added routing module and new components
-2. **`app.component.html`** - Changed to `<router-outlet>`
+1. **`app.module.ts`** - Added routing module and new components (including ATS)
+2. **`app.component.html`** - Changed to `<router-outlet>` with nav bar
 3. **`interview-form.component.ts`** - Navigate after generation
 4. **`interview-form.component.html`** - Removed question list display
 5. **`interview-form.component.css`** - Added error message styling
-6. **`services/interview.service.ts`** - Added new API methods
+6. **`services/interview.service.ts`** - Added new API methods (interview + ATS)
+7. **`styles.css`** - Added nav bar styles
 
 ### Backend
-7. **`models/models.py`** - Added Answer model
-8. **`controllers/interview_controller.py`** - Fixed question ID issue, added endpoints
-9. **`services/gemini_service.py`** - Added evaluation method
+8. **`models/models.py`** - Added Answer and ATSScan models
+9. **`controllers/interview_controller.py`** - Fixed question ID issue, added endpoints
+10. **`controllers/ats_controller.py`** - New ATS blueprint
+11. **`services/gemini_service.py`** - Added evaluation and ATS analysis methods
+12. **`app.py`** - Registered ATS blueprint
+13. **`requirements.txt`** - Added PyPDF2
 
 ---
 
@@ -104,6 +172,8 @@ A complete refactor of the interview application from a single-page to a multi-p
 - **Home** (`/`) - Interview form
 - **Answer** (`/interview/:id?question=N`) - Question answering
 - **Results** (`/results/:id`) - Score summary
+- **ATS Form** (`/ats`) - Resume upload + JD input
+- **ATS Results** (`/ats/results/:id`) - ATS score breakdown
 
 ### 2. Question Answering Page
 - Display one question at a time
@@ -152,6 +222,16 @@ A complete refactor of the interview application from a single-page to a multi-p
 - User doesn't wait for AI
 - Evaluation completes asynchronously
 - Results available on results page
+
+### 6. ATS Resume Scanner
+- PDF upload with drag-and-drop
+- PDF validation (magic bytes, size, page count)
+- Text extraction with guardrails
+- ATS compatibility scoring (0-100)
+- Category breakdowns: keywords, skills, experience, format
+- Keyword analysis (matched/missing)
+- AI-powered improvement suggestions
+- Multipart form data handling
 
 ---
 
@@ -234,27 +314,29 @@ A complete refactor of the interview application from a single-page to a multi-p
 
 ## 📡 API Endpoints
 
-### Generate Questions
+### Interview API (`/api/interview`)
+
+#### Generate Questions
 ```
 POST /api/interview/generate
 Body: { name, email, role, industry, experience: {skill: years}, job_description }
 Response: { interview_id, user, questions }
 ```
 
-### Get Questions
+#### Get Questions
 ```
 GET /api/interview/questions/:interviewId
 Response: { interview_id, questions[] }
 ```
 
-### Submit Answer
+#### Submit Answer
 ```
 POST /api/interview/answer
 Body: { question_id, answer_text }
 Response: { answer_id, question_id, answer_text, message }
 ```
 
-### Evaluate Answer
+#### Evaluate Answer
 ```
 POST /api/interview/evaluate/:answerId
 Response: { 
@@ -264,6 +346,32 @@ Response: {
   ai_feedback,
   evaluation: { score, feedback, strengths[], improvements[] }
 }
+```
+
+### ATS API (`/api/ats`)
+
+#### Scan Resume
+```
+POST /api/ats/scan
+Content-Type: multipart/form-data
+Body: resume (PDF file), job_description (text)
+Response: {
+  id,
+  overall_score,
+  keywords_score,
+  skills_score,
+  experience_score,
+  format_score,
+  matched_keywords[],
+  missing_keywords[],
+  suggestions[]
+}
+```
+
+#### Get Scan
+```
+GET /api/ats/scan/:scanId
+Response: { same as above }
 ```
 
 ---
@@ -276,6 +384,9 @@ Response: {
 - [ ] Questions generation working
 - [ ] Answer submission endpoint works
 - [ ] Evaluation endpoint returns score
+- [ ] ATS scan endpoint works (PDF upload)
+- [ ] ATS validation errors handled (400)
+- [ ] ATS AI failures handled (502)
 
 ### Frontend Testing
 - [ ] Start Angular app: `cd web && npm start`
@@ -292,6 +403,13 @@ Response: {
 - [ ] Question cards expand/collapse
 - [ ] Retake interview works
 - [ ] Start new interview works
+- [ ] ATS form loads at /ats
+- [ ] PDF upload works (drag-and-drop + click)
+- [ ] File validation works (size, type)
+- [ ] ATS results page loads
+- [ ] Score circle displays correctly
+- [ ] Category bars render
+- [ ] Keywords chips display
 
 ### Integration Testing
 - [ ] End-to-end flow completes
@@ -300,6 +418,7 @@ Response: {
 - [ ] Back button works correctly
 - [ ] Mobile responsive design works
 - [ ] Error handling displays properly
+- [ ] ATS upload → results flow works
 
 ---
 
@@ -414,13 +533,18 @@ GEMINI_MODEL=gemini-2.5-flash
 - [ ] Multi-language support
 - [ ] Dark mode toggle
 - [ ] Custom question templates
+- [ ] ATS: Support for DOCX resume upload
+- [ ] ATS: Resume parsing with section detection
+- [ ] ATS: Batch resume scanning
+- [ ] ATS: Resume optimization tips
+- [ ] ATS: Job description generation from title
 
 ---
 
 ## 👥 Credits
 
 Built with:
-- **Backend**: Flask, SQLAlchemy, Google Gemini AI
+- **Backend**: Flask, SQLAlchemy, Google Gemini AI, LangChain, PyPDF2
 - **Frontend**: Angular 16, TypeScript, RxJS
 - **Styling**: Custom CSS with modern effects
 - **Database**: SQLite (production: PostgreSQL)
@@ -431,13 +555,15 @@ Built with:
 
 - All AI evaluations use Gemini 2.5 Flash model (default; override via `GEMINI_MODEL`)
 - Character limit enforced at 5000 (both frontend and backend)
-- Scores range from 0-10
+- Scores range from 0-10 for interview, 0-100 for ATS
 - Overall score is average of all question scores
+- ATS scores are weighted: keywords (30%), skills (30%), experience (25%), format (15%)
 - Database auto-creates on first run
 - CORS enabled for local development
+- PDF uploads limited to 2MB and 50 pages
 
 ---
 
 **Implementation Complete! 🎉**
 
-The application now provides a smooth, professional interview experience with AI-powered evaluation and a beautiful multi-page wizard flow.
+The application now provides a smooth, professional interview experience with AI-powered evaluation, a beautiful multi-page wizard flow, and an ATS resume scanner for job seekers.
