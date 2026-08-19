@@ -1,20 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { InterviewService } from '../../services/qc.service';
-
-interface Question {
-  id: number;
-  text: string;
-  topic: string;
-  difficulty: string;
-  score: number;
-  answer?: {
-    id: number;
-    text: string;
-    ai_score: number;
-    ai_feedback: string;
-  } | null;
-}
+import { Question } from '../../models/question.model';
+import { InterviewService } from '../../services/interview.service';
 
 @Component({
   selector: 'app-results',

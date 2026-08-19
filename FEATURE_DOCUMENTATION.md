@@ -156,7 +156,7 @@ The AI evaluates answers based on:
 
 After pulling these changes, run the Flask app to auto-create the new `answers` table:
 ```bash
-cd interview-api
+cd interviewi-api
 python app.py
 ```
 
@@ -167,7 +167,7 @@ The `db.create_all()` in `app.py` will automatically create the new table.
 ### Backend Testing
 ```bash
 # Start the Flask API
-cd interview-api
+cd interviewi-api
 python app.py
 
 # API will run on http://localhost:5000

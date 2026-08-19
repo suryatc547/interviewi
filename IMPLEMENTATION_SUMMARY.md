@@ -271,7 +271,7 @@ Response: {
 ## 🧪 Testing Checklist
 
 ### Backend Testing
-- [ ] Start Flask server: `cd interview-api && python app.py`
+- [ ] Start Flask server: `cd interviewi-api && python app.py`
 - [ ] Database tables created automatically
 - [ ] Questions generation working
 - [ ] Answer submission endpoint works
@@ -308,7 +308,7 @@ Response: {
 1. **Fixed null question.id issue**
    - Problem: `question.id` was null in response
    - Solution: Build response array after `db.session.commit()`
-   - Location: `interview_controller.py`
+    - Location: `interview_controller.py`
 
 ---
 
@@ -329,8 +329,8 @@ Response: {
 
 ### Backend Setup
 ```bash
-cd interview-api
-pip install -r requirements.txt
+cd interviewi-api
+pip install -r requirements-dev.txt
 python app.py
 # Server runs on http://localhost:5000
 ```
@@ -344,10 +344,11 @@ npm start
 ```
 
 ### Environment Variables
-Create `interview-api/.env`:
+Create `interviewi-api/.env`:
 ```
 GOOGLE_API_KEY=your_gemini_api_key_here
-DATABASE_URI=sqlite:///interview.db
+DATABASE_URL=sqlite:///interview.db
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 ---
@@ -420,7 +421,7 @@ DATABASE_URI=sqlite:///interview.db
 
 Built with:
 - **Backend**: Flask, SQLAlchemy, Google Gemini AI
-- **Frontend**: Angular 18, TypeScript, RxJS
+- **Frontend**: Angular 16, TypeScript, RxJS
 - **Styling**: Custom CSS with modern effects
 - **Database**: SQLite (production: PostgreSQL)
 
@@ -428,7 +429,7 @@ Built with:
 
 ## 📝 Notes
 
-- All AI evaluations use Gemini 2.0 Flash model
+- All AI evaluations use Gemini 2.5 Flash model (default; override via `GEMINI_MODEL`)
 - Character limit enforced at 5000 (both frontend and backend)
 - Scores range from 0-10
 - Overall score is average of all question scores

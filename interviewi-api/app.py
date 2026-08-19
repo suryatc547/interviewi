@@ -1,12 +1,18 @@
+import logging
+
 from flask import Flask
 from flask_cors import CORS
+
 from config import Config
+from controllers.interview_controller import interview_bp
 from models.models import db
-from controllers.qc_controller import interview_bp
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
     CORS(app)
     db.init_app(app)
@@ -18,6 +24,7 @@ def create_app():
         db.create_all()
 
     return app
+
 
 if __name__ == '__main__':
     app = create_app()
