@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 import { InterviewFormComponent } from './components/interview-form/interview-form.component';
 import { QuestionAnswerComponent } from './components/question-answer/question-answer.component';
 import { ResultsComponent } from './components/results/results.component';
+import { ATSFormComponent } from './components/ats-form/ats-form.component';
+import { ATSResultsComponent } from './components/ats-results/ats-results.component';
 import { InterviewService } from './services/interview.service';
 
 @NgModule({
@@ -15,7 +17,9 @@ import { InterviewService } from './services/interview.service';
     AppComponent,
     InterviewFormComponent,
     QuestionAnswerComponent,
-    ResultsComponent
+    ResultsComponent,
+    ATSFormComponent,
+    ATSResultsComponent
   ],
   imports: [
     BrowserModule,

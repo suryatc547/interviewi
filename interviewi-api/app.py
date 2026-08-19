@@ -4,6 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from config import Config
+from controllers.ats_controller import ats_bp
 from controllers.interview_controller import interview_bp
 from models.models import db
 
@@ -19,6 +20,7 @@ def create_app():
 
     # Register Blueprints
     app.register_blueprint(interview_bp, url_prefix='/api/interview')
+    app.register_blueprint(ats_bp, url_prefix='/api/ats')
 
     with app.app_context():
         db.create_all()

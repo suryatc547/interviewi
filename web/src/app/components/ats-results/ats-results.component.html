@@ -1,0 +1,160 @@
+<div class="ats-results-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading scan results...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <div class="error-icon">&#9888;&#65039;</div>
+    <h2>Oops! Something went wrong</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="startNewScan()">Scan Again</button>
+  </div>
+
+  <!-- Results Content -->
+  <div *ngIf="!isLoading && !errorMessage && result" class="content">
+    <!-- Header -->
+    <div class="results-header">
+      <h1>ATS Compatibility Report</h1>
+      <p class="subtitle">Here's how your resume matches this job description</p>
+    </div>
+
+    <!-- Overall Score Card -->
+    <div class="overall-score-card">
+      <div class="score-circle">
+        <svg viewBox="0 0 200 200" class="circular-progress">
+          <circle cx="100" cy="100" r="90" class="bg-circle"></circle>
+          <circle
+            cx="100"
+            cy="100"
+            r="90"
+            class="progress-circle"
+            [style.stroke-dashoffset]="565 - (565 * overallPercentage / 100)"
+            [ngClass]="scoreGradeClass"
+          ></circle>
+        </svg>
+        <div class="score-text">
+          <div class="score-value">{{ overallPercentage }}</div>
+          <div class="score-total">/100</div>
+        </div>
+      </div>
+
+      <div class="score-details">
+        <h2>Overall ATS Score</h2>
+        <div class="grade-badge" [ngClass]="scoreGradeClass">
+          {{ scoreGrade }}
+        </div>
+        <p class="score-description">
+          <span *ngIf="overallPercentage >= 80">Your resume is well-optimized for this position. Minor tweaks could make it even better.</span>
+          <span *ngIf="overallPercentage >= 60 && overallPercentage < 80">Your resume has a good foundation. Follow the suggestions below to improve your match.</span>
+          <span *ngIf="overallPercentage >= 40 && overallPercentage < 60">Your resume needs some work to better align with this job. Focus on the missing keywords and suggestions.</span>
+          <span *ngIf="overallPercentage < 40">Your resume significantly differs from this job's requirements. Consider substantial revisions using the suggestions below.</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Category Scores -->
+    <div class="category-scores">
+      <h2 class="section-title">Score Breakdown</h2>
+      <div class="category-grid">
+        <div class="category-card">
+          <div class="category-header">
+            <span class="category-icon">&#128270;</span>
+            <span class="category-name">Keywords</span>
+          </div>
+          <div class="category-score" [ngClass]="getScoreClass(result.keyword_score)">
+            {{ result.keyword_score }}%
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [ngClass]="getScoreClass(result.keyword_score)"
+              [style.width.%]="result.keyword_score"></div>
+          </div>
+          <p class="category-desc">How many job-specific keywords appear in your resume</p>
+        </div>
+
+        <div class="category-card">
+          <div class="category-header">
+            <span class="category-icon">&#128736;</span>
+            <span class="category-name">Skills</span>
+          </div>
+          <div class="category-score" [ngClass]="getScoreClass(result.skills_score)">
+            {{ result.skills_score }}%
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [ngClass]="getScoreClass(result.skills_score)"
+              [style.width.%]="result.skills_score"></div>
+          </div>
+          <p class="category-desc">Alignment of your skills with the job requirements</p>
+        </div>
+
+        <div class="category-card">
+          <div class="category-header">
+            <span class="category-icon">&#128197;</span>
+            <span class="category-name">Experience</span>
+          </div>
+          <div class="category-score" [ngClass]="getScoreClass(result.experience_score)">
+            {{ result.experience_score }}%
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [ngClass]="getScoreClass(result.experience_score)"
+              [style.width.%]="result.experience_score"></div>
+          </div>
+          <p class="category-desc">How your experience level matches the position</p>
+        </div>
+
+        <div class="category-card">
+          <div class="category-header">
+            <span class="category-icon">&#128196;</span>
+            <span class="category-name">Format</span>
+          </div>
+          <div class="category-score" [ngClass]="getScoreClass(result.format_score)">
+            {{ result.format_score }}%
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [ngClass]="getScoreClass(result.format_score)"
+              [style.width.%]="result.format_score"></div>
+          </div>
+          <p class="category-desc">Resume structure and ATS-readability</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keywords Section -->
+    <div class="keywords-section">
+      <div class="keywords-column">
+        <h3 class="keywords-title matched">&#10003; Matched Keywords</h3>
+        <div class="keyword-chips" *ngIf="result.matched_keywords.length > 0">
+          <span class="keyword-chip matched" *ngFor="let kw of result.matched_keywords">{{ kw }}</span>
+        </div>
+        <p class="no-keywords" *ngIf="result.matched_keywords.length === 0">No significant keywords matched</p>
+      </div>
+      <div class="keywords-column">
+        <h3 class="keywords-title missing">&#10007; Missing Keywords</h3>
+        <div class="keyword-chips" *ngIf="result.missing_keywords.length > 0">
+          <span class="keyword-chip missing" *ngFor="let kw of result.missing_keywords">{{ kw }}</span>
+        </div>
+        <p class="no-keywords" *ngIf="result.missing_keywords.length === 0">Great! No critical keywords are missing</p>
+      </div>
+    </div>
+
+    <!-- Suggestions Section -->
+    <div class="suggestions-section">
+      <h2 class="section-title">Improvement Suggestions</h2>
+      <div class="suggestions-list">
+        <div class="suggestion-item" *ngFor="let suggestion of result.suggestions; let i = index">
+          <span class="suggestion-num">{{ i + 1 }}</span>
+          <span class="suggestion-text">{{ suggestion }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" (click)="startNewScan()">
+        Scan Another Resume
+      </button>
+    </div>
+  </div>
+</div>

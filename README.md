@@ -1,14 +1,24 @@
 # AI Interview Wizard (interviewi)
 
-An intelligent, multi-page technical interview simulator powered by Google Gemini AI. 
+An intelligent, multi-page technical interview simulator and ATS resume scanner powered by Google Gemini AI. 
 
-This application allows users to generate customized interview questions based on their target role, industry, and skills/experience (optionally grounded in a job description). It guides them through a seamless question-by-question wizard, asynchronously evaluating their answers in the background, and provides comprehensive feedback and scoring upon completion.
+This application provides two main features:
+1. **Interview Simulator**: Generate customized interview questions based on your target role, industry, and skills/experience (optionally grounded in a job description). Answer them one at a time in a wizard, with background AI evaluation and comprehensive feedback.
+2. **ATS Resume Scanner**: Upload a PDF resume and paste a job description to get an ATS compatibility score, keyword analysis, and actionable improvement suggestions.
 
 ## 🌟 Features
+
+### Interview Simulator
 - **AI-Powered Question Generation**: Generates relevant technical questions using Google Gemini (default `gemini-2.5-flash`, configurable via `GEMINI_MODEL`).
 - **Interactive Multi-Page Wizard**: Focused, one-question-at-a-time user experience with progress tracking.
 - **Background Evaluation**: Non-blocking architecture evaluates answers asynchronously as the user progresses.
 - **Rich Results Dashboard**: Animated circular score charts and detailed feedback (strengths and areas for improvement).
+
+### ATS Resume Scanner
+- **PDF Resume Upload**: Drag-and-drop or click-to-upload with validation (2MB max, 50-page limit).
+- **ATS Compatibility Scoring**: Overall score (0-100) with category breakdowns (keywords, skills, experience, format).
+- **Keyword Analysis**: Shows matched and missing keywords from the job description.
+- **Improvement Suggestions**: AI-powered actionable recommendations to improve resume-JD match.
 
 ---
 
@@ -57,7 +67,7 @@ npm start
 ### 3. Tests & lint
 ```bash
 # Backend (from interviewi-api/)
-python -m pytest -q        # 31 tests
+python -m pytest -q        # 104 tests
 python -m ruff check .
 
 # Frontend (from web/)
@@ -70,6 +80,7 @@ npm run build               # production build
 
 ## 📖 Documentation
 Detailed documentation about the architecture and implementation flows can be found in the root directory:
-- `IMPLEMENTATION_SUMMARY.md`: Overview of the wizard flow refactor.
+- `IMPLEMENTATION_SUMMARY.md`: Overview of the wizard flow refactor and ATS scanner.
 - `WIZARD_FLOW_DOCUMENTATION.md`: Deep dive into the multi-page logic.
+- `FEATURE_DOCUMENTATION.md`: Feature specs for answer submission and ATS scanner.
 - `QUICK_START.md`: Additional commands and routing information.

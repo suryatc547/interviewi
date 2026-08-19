@@ -42,3 +42,18 @@ class Answer(db.Model):
     ai_feedback = db.Column(db.Text)  # Feedback from AI evaluation
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class ATSScan(db.Model):
+    __tablename__ = 'ats_scans'
+    id = db.Column(db.Integer, primary_key=True)
+    resume_text = db.Column(db.Text, nullable=False)
+    job_description = db.Column(db.Text, nullable=False)
+    overall_score = db.Column(db.Integer, default=0)
+    keyword_score = db.Column(db.Integer, default=0)
+    skills_score = db.Column(db.Integer, default=0)
+    experience_score = db.Column(db.Integer, default=0)
+    format_score = db.Column(db.Integer, default=0)
+    matched_keywords = db.Column(db.JSON, default=list)
+    missing_keywords = db.Column(db.JSON, default=list)
+    suggestions = db.Column(db.JSON, default=list)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

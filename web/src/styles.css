@@ -1,2 +1,33 @@
 /* You can add global styles to this file, and also import other style files */
-body { font-family: 'Roboto', sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+
+.main-nav {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.main-nav a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  transition: all 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.main-nav a.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
